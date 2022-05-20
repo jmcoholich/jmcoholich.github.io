@@ -5,11 +5,12 @@ widget: pages
 
 # This file represents a page section.
 headless: true
+# active: False
 
 # Order that this section appears on the page.
 weight: 50
 
-title: Recent Publications
+title: Publications
 subtitle: ''
 
 content:
@@ -32,8 +33,8 @@ content:
   order: desc
 design:
   # Choose a view for the listings:
-  view: citation
-  columns: '2'
+  view:
+  columns: '1'
 ---
 
 <!-- {{% callout note %}}

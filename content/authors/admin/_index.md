@@ -12,8 +12,8 @@ role: Robotics PhD Student
 organizations:
   - name: Georgia Institute of Technology
     url: https://www.gatech.edu/
-  - name: Robotics Perception and Learning (RIPL) Lab
-    url: https://faculty.cc.gatech.edu/~zk15/
+  # - name: Robotics Perception and Learning (RIPL) Lab
+  #   url: https://faculty.cc.gatech.edu/~zk15/
 
 # Short bio (displayed in user profile at end of posts)
 bio: My research interests include deep learning, reinforcement learning, and legged robots.
@@ -30,10 +30,10 @@ education:
   courses:
     - course: PhD in Robotics
       institution: Georgia Institute of Technology
-      year: Expected 2025
+      year: 2025 (expected)
     - course: Masters in Computer Science
       institution: Georgia Institute of Technology
-      year: Expected 2022
+      year: 2022 (expected)
     - course: BS in Mechanical Engineering
       institution: The University of Texas at Austin
       year: 2019
@@ -74,8 +74,8 @@ highlight_name: true
 ---
 
 
-I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech, advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My research involves XYZ.
+I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust is the application of reinforcement learning to robotics and legged locomotion. I am also interested in using learned priors to increase sample efficiency and decrease reward engineering for reinforcement learning for real-world tasks.
 
-As an undergrad, I did research with Luis Sentis and Gray. I also did three cool internships in undergrad and worked on the FSAE team. I worked on the SpaceX Dragon Capsule, Harmony Robot, and the Perserverance Rover.
+During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I had the pleasure of working with [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/electric-vehicle).
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "uploads/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.

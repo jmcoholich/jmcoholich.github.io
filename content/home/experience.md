@@ -2,12 +2,14 @@
 # An instance of the Experience widget.
 # Documentation: https://wowchemy.com/docs/page-builder/
 widget: experience
+active: False
 
 # This file represents a page section.
 headless: true
 
 # Order that this section appears on the page.
 weight: 40
+activate: False
 
 title: Experience
 subtitle:
@@ -31,7 +33,7 @@ experience:
     date_end: ''
     description: |2-
         Responsibilities include:
-        
+
         * Analysing
         * Modelling
         * Deploying

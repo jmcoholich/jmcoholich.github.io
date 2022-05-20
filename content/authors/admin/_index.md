@@ -23,6 +23,7 @@ interests:
   - Reinforcement Learning
   - Legged Locomotion
   - Deep Learning
+  - Robotics
 
 # Education to show in About widget
 education:
@@ -73,10 +74,8 @@ highlight_name: true
 ---
 
 
-I am a massive sharcheese. In fact, go full on flarteeder.
+I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech, advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My research involves XYZ.
 
-Nelson Bighetti is a professor of artificial intelligence at the Stanford AI Lab. His research interests include distributed robotics, mobile computing and programmable matter. He leads the Robotic Neurobiology group, which develops self-reconfiguring robots, systems of self-organizing robots, and mobile sensor networks.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed neque elit, tristique placerat feugiat ac, facilisis vitae arcu. Proin eget egestas augue. Praesent ut sem nec arcu pellentesque aliquet. Duis dapibus diam vel metus tempus vulputate.
+As an undergrad, I did research with Luis Sentis and Gray. I also did three cool internships in undergrad and worked on the FSAE team. I worked on the SpaceX Dragon Capsule, Harmony Robot, and the Perserverance Rover.
 
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "uploads/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.

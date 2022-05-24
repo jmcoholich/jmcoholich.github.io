@@ -1,6 +1,5 @@
 ---
-title: 'Evaluation of energy density measures and validation for powder bed
-fusion of polyamide'
+title: 'Evaluation of energy density measures and validation for powder bed fusion of polyamide'
 
 # Authors
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
@@ -16,7 +15,7 @@ authors:
 #   - 'Equal contribution'
 #   - 'Equal contribution'
 
-date: '2013-07-01T00:00:00Z'
+date: '2017-04-01T00:00:00Z'
 doi: ''
 
 # Schedule page publish date (NOT publication's date).
@@ -29,8 +28,8 @@ publishDate: '2017-01-01T00:00:00Z'
 publication_types: ['2']
 
 # Publication name and optional abbreviated publication name.
-publication: In 2020 3rd IEEE International Conference on Soft Robotics (RoboSoft)
-publication_short: In IEEE RoboSoft
+publication: CIRP Annals Volume 66, Issue 1, 2017, Pages 217-220
+publication_short: CIRP Annals, 2017
 
 abstract: "For powder bed fusion additive manufacturing, energy density captures the interrelated effects of beam
 power/size, scanning speed, hatch spacing and layer thickness. Relations for energy density include linear,
@@ -40,8 +39,8 @@ densities. Test pieces were printed with varying parameters: laser power, hatch 
 thickness. Results show that total energy density is correlated to both and mass density and strength for a
 volumetric energy density."
 
-# # Summary. An optional shortened abstract.
-# summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum.
+# Summary. An optional shortened abstract.
+summary: Characterizing the structual effects of laser energy density on 3D-printed nylon
 
 tags: []
 
@@ -85,7 +84,7 @@ image:
 # slides: example
 ---
 
-{{% callout note %}}
+<!-- {{% callout note %}}
 Click the _Cite_ button above to demo the feature to enable visitors to import publication metadata into their reference management software.
 {{% /callout %}}
 
@@ -93,4 +92,4 @@ Click the _Cite_ button above to demo the feature to enable visitors to import p
 Create your slides in Markdown - click the _Slides_ button to check out the example.
 {{% /callout %}}
 
-Supplementary notes can be added here, including [code, math, and images](https://wowchemy.com/docs/writing-markdown-latex/).
+Supplementary notes can be added here, including [code, math, and images](https://wowchemy.com/docs/writing-markdown-latex/). -->

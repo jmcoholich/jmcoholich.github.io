@@ -78,4 +78,6 @@ I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics)
 
 During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I had the pleasure of working with [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/electric-vehicle).
 
+I also enjoy hiking, running, and rock climbing.
+
 {{< icon name="download" pack="fas" >}} Download my {{< staticref "uploads/demo_resume.pdf" "newtab" >}}resumé{{< /staticref >}}.

@@ -1,51 +1,53 @@
 ---
-title: 'Evaluation of energy density measures and validation for powder bed fusion of polyamide'
+title: 'Reinforcement Learning for Dynamical Systems'
 
 # Authors
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
 # and it will be replaced with their full name and linked to their profile.
 authors:
-  - David Bourell
   - Jeremiah Coholich
-  - Antione Chalancon
-  - Abhimanyu Bhat
-
+  - Cesar Santoyo
+  - Angel Yam
+  - Pratik Kunapuli
 # # Author notes (optional)
 # author_notes:
 #   - 'Equal contribution'
 #   - 'Equal contribution'
 
-date: '2017-04-01T00:00:00Z'
+date: '2020-05-01T00:00:00Z'
 doi: ''
 
 # Schedule page publish date (NOT publication's date).
-publishDate: '2017-01-01T00:00:00Z'
+# publishDate: '2017-01-01T00:00:00Z'
 
 # Publication type.
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
 # 3 = Preprint / Working Paper; 4 = Report; 5 = Book; 6 = Book section;
 # 7 = Thesis; 8 = Patent
-publication_types: ['2']
+publication_types: ['4']
 
 # Publication name and optional abbreviated publication name.
-publication: CIRP Annals Volume 66, Issue 1, 2017, Pages 217-220
-publication_short: CIRP Annals, 2017
+publication: Final Project for Statistical Machine Learning (ECE 6254), Spring 2020
+publication_short: ECE 6254 Final Project, 2020
 
-abstract: "For powder bed fusion additive manufacturing, energy density captures the interrelated effects of beam
-power/size, scanning speed, hatch spacing and layer thickness. Relations for energy density include linear,
-areal and volumetric forms, developed empirically or theoretically. Various energy density formulations
-for laser sintering of polyamide 12 were evaluated based on correlation to measured part mass relative
-densities. Test pieces were printed with varying parameters: laser power, hatch spacing and layer
-thickness. Results show that total energy density is correlated to both and mass density and strength for a
-volumetric energy density."
+abstract: "In this project, we survey a variety of reinforcement learning (RL) techniques and study them
+in the context of dynamical systems; specifically, we address the cart-pole problem. In general,
+RL algorithms achieve their goal by observing a system’s state and executing an action based on
+the expected reward given by the environment. We perform a review of RL literature highlighting
+existing approaches. For brevity, we limit our survey to literature relevant to dynamical systems.
+Furthermore, we implement a series of RL algorithms using the OpenAI’s Gym [1] and Pytorch
+[2]. Specifically, we implement 1) a basic algorithm countering pole motion, 2) policy gradient
+utilizing a two-layer neural network, 3) deep Q-learning backed by a three-layer neural network,
+and 4) model predictive control (MPC). To conclude, we compare the individual performance of
+the the RL techniques against the results of the MPC."
 
 # Summary. An optional shortened abstract.
-summary: Characterizing the structual effects of laser energy density on 3D-printed nylon
+summary: We evaluate the performance of reinforcement learning and other control algorithms on the Open AI Gym CartPole environment. (ECE 6254 final project)
 
-tags: ['published']
+tags: ['unpublished']
 
 # Display this page in the Featured widget?
-featured: false
+featured: true
 
 # Custom links (uncomment lines below)
 # links:
@@ -64,7 +66,7 @@ url_video: ''
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  caption: ''
+  caption: "See PDF for labels"
   focal_point: ''
   preview_only: false
 

@@ -40,7 +40,7 @@ abstract: Dynamic legged locomotion is being explored as a means to maneuver on 
 # Summary. An optional shortened abstract.
 summary: Embedding sensors into a robotic foot and using them classify terrain with machine learning
 
-tags: []
+tags: ['published']
 
 # Display this page in the Featured widget?
 featured: true

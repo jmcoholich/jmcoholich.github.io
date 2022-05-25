@@ -1,70 +1,68 @@
 ---
-title: 'Evaluation of energy density measures and validation for powder bed fusion of polyamide'
+title: 'Sim2Real Transfer for Quadrupedal Locomotion'
 
 # Authors
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
 # and it will be replaced with their full name and linked to their profile.
 authors:
-  - David Bourell
   - Jeremiah Coholich
-  - Antione Chalancon
-  - Abhimanyu Bhat
 
 # # Author notes (optional)
 # author_notes:
 #   - 'Equal contribution'
 #   - 'Equal contribution'
 
-date: '2017-04-01T00:00:00Z'
+date: '2021-05-01T00:00:00Z'
 doi: ''
 
 # Schedule page publish date (NOT publication's date).
-publishDate: '2017-01-01T00:00:00Z'
+# publishDate: '2017-01-01T00:00:00Z'
 
 # Publication type.
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
 # 3 = Preprint / Working Paper; 4 = Report; 5 = Book; 6 = Book section;
 # 7 = Thesis; 8 = Patent
-publication_types: ['2']
+publication_types: ['4']
 
 # Publication name and optional abbreviated publication name.
-publication: CIRP Annals Volume 66, Issue 1, 2017, Pages 217-220
-publication_short: CIRP Annals, 2017
+publication: Writeup for Robotics PhD Qualifying Exam, 2021
+publication_short: Writeup for Quals Exam
 
-abstract: "For powder bed fusion additive manufacturing, energy density captures the interrelated effects of beam
-power/size, scanning speed, hatch spacing and layer thickness. Relations for energy density include linear,
-areal and volumetric forms, developed empirically or theoretically. Various energy density formulations
-for laser sintering of polyamide 12 were evaluated based on correlation to measured part mass relative
-densities. Test pieces were printed with varying parameters: laser power, hatch spacing and layer
-thickness. Results show that total energy density is correlated to both and mass density and strength for a
-volumetric energy density."
+abstract: "Transferring policies learned in simulation via reinforcement learning (RL) to the real world is a challenging research problem in robotics. In this study, the sim2real transfer method of three papers is examined. In [2], the RL agent learns a robust policy by limiting the observation size and using domain randomization. The sim2real method in [11]
+learns an adaptive policy conditioned on a latent space that
+implicitly encodes the physics parameters of its environment. Samples must be collected on the robot to learn a
+latent space corresponding to the physics of the real world.
+In [6], the authors also employ a learned latent space, but
+constrain the mutual information between the latent variables and the input. This ”information bottleneck” prevents
+the latent space from overfitting to the simulation physics
+parameters. Finally, I propose using the same information
+bottleneck approach on policy observations to learn a robust policy more effectively."
 
 # Summary. An optional shortened abstract.
-summary: Characterizing the structual effects of laser energy density on 3D-printed nylon
-
-tags: ['published']
+summary: I review two sim2real transfer papers for robotics and then propose a new method using an "information bottleneck". (Robotics PhD Qualifying Exam)
+tags: ['unpublished']
 
 # Display this page in the Featured widget?
-featured: false
+featured: true
 
 # Custom links (uncomment lines below)
 # links:
 # - name: Custom Link
-#   url: http://example.org
+#   url: "#content/slides/quals/quals.pdf"
 
 url_pdf: ''
 url_code: ''
 url_dataset: ''
 url_poster: ''
 url_project: ''
-url_slides: ''
+url_slides: 'quals_slides.pdf'
 url_source: ''
 url_video: ''
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  caption: ''
+  caption: 'A proposed architecture for learning robust polices for real-world deployment'
   focal_point: ''
   preview_only: false
 
@@ -81,7 +79,7 @@ image:
 #   Simply enter your slide deck's filename without extension.
 #   E.g. `slides: "example"` references `content/slides/example/index.md`.
 #   Otherwise, set `slides: ""`.
-# slides: example
+# slides: quals/quals.pdf
 ---
 
 <!-- {{% callout note %}}

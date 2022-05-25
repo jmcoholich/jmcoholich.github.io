@@ -58,7 +58,7 @@ exoskeleton."
 # Summary. An optional shortened abstract.
 summary: Designing hardware and a control algorithm for an adjustable-stiffness arm exoskeleton
 
-tags: []
+tags: ['published']
 
 # Display this page in the Featured widget?
 featured: true

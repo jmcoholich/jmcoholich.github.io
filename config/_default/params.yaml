@@ -18,7 +18,7 @@ marketing:
     site_type: Person
     local_business_type: ''
     org_name: ''
-    description: 'Jeremiah Coholich's personal website'
+    description: "Jeremiah Coholich's personal website"
     # twitter: 'wowchemy'
   analytics:
     google_analytics: ''

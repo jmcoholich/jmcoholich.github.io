@@ -10,7 +10,7 @@ active: false
 # Order that this section appears on the page.
 weight: 65
 
-title: Unpublished Projects
+title: Other Projects
 subtitle: ''
 
 content:
@@ -42,7 +42,7 @@ design:
   #   2 = Compact
   #   3 = Card
   #   5 = Showcase
-  view: compact
+  view: 3
 
   # For Showcase view, flip alternate rows?
   flip_alt_rows: True

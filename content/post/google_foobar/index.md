@@ -49,6 +49,9 @@ authors:
 - dynamic programming
 - graph algorithms
 - combinatorics
+- Burnside's Lemma and Pólya enumeration theorem, group theory
+
+The last question was the hardest and involved (the above). I had to refresh myself on group theory and learn Burnside's lemma.
 
 
 <!-- What were all the problems I had

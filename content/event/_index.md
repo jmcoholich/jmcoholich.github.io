@@ -1,5 +1,6 @@
 ---
 title: Recent & Upcoming Talks
+active: False
 cms_exclude: true
 
 # View.

@@ -31,10 +31,10 @@ education:
     - course: PhD in Robotics
       institution: Georgia Institute of Technology
       year: 2025 (expected)
-    - course: Masters in Computer Science
+    - course: MS in Computer Science
       institution: Georgia Institute of Technology
       year: 2022 (expected)
-    - course: BS in Mechanical Engineering
+    - course: BS in Mechanical Engineering, Highest Honors
       institution: The University of Texas at Austin
       year: 2019
 

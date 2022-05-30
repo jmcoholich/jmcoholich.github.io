@@ -49,7 +49,7 @@ authors:
 - dynamic programming
 - graph algorithms
 - combinatorics
-- Burnside's Lemma and Pólya enumeration theorem, group theory, permutation groups, orbits and stabilizers, group actions
+- Burnside's Lemma and Pólya enumeration theorem, group theory, permutation groups, orbits and stabilizers, group actions, Stirling numbers of the first kind, cycle indices
 
 The last question was the hardest and involved (the above). I had to refresh myself on group theory and learn Burnside's lemma.
 

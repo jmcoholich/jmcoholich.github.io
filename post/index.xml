@@ -1,1 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | Jeremiah Coholich</title><link>https://jmcoholich.github.io/post/</link><atom:link href="https://jmcoholich.github.io/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Posts</title><link>https://jmcoholich.github.io/post/</link></image></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | Jeremiah Coholich</title><link>https://jmcoholich.github.io/post/</link><atom:link href="https://jmcoholich.github.io/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Tue, 31 May 2022 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Posts</title><link>https://jmcoholich.github.io/post/</link></image><item><title>I Completed the Google Foobar Challenge</title><link>https://jmcoholich.github.io/post/google_foobar/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/google_foobar/</guid><description>&lt;!-- ## Here's what the challenge is -->
+&lt;p>The Google Foobar challenge is a programming challenge used by Google for recruiting. You must be invited to participate (&lt;a href="https://bootcamp.uxdesign.cc/google-foobar-googles-secret-hiring-process-bc92f011c6ad" target="_blank" rel="noopener">article&lt;/a> with more info). The challenge contains five levels of increasing difficulty, which require knowlege in the following areas:&lt;/p>
+&lt;ul>
+&lt;li>dynamic programming&lt;/li>
+&lt;li>graph theory&lt;/li>
+&lt;li>combinatorics&lt;/li>
+&lt;/ul>
+&lt;p>The final level was indeed the most challenging and required me to understand &lt;a href="https://en.wikipedia.org/wiki/Permutation_group" target="_blank" rel="noopener">permutation groups&lt;/a> and apply the &lt;a href="https://en.wikipedia.org/wiki/P%C3%B3lya_enumeration_theorem" target="_blank" rel="noopener">Pólya enumeration theorem&lt;/a>.&lt;/p>
+&lt;!-- ## Here's a screenshot of the finish
+## Here are some concepts I had to use -->
+&lt;!-- - Burnside's Lemma and Pólya enumeration theorem, group theory, permutation groups, orbits and stabilizers, group actions, Stirling numbers of the first kind, cycle indices -->
+&lt;!-- The last question was the hardest and involved (the above). I had to refresh myself on group theory and learn Burnside's lemma. -->
+&lt;!-- What were all the problems I had
+level 1: Remove names that occur more than n times from a list
+level 2: arranging plates to get numbers divisible by 3, some other DP stuff
+level 3: triplets of divisible numbers (DP), the replicating bombs (discrete math, graphs?), number of possible staircases that can be built (DP)
+level 4: laser gun bouncing (idk), the set cover ish thing (combinatorics) -->
+&lt;p>Upon completion, I received a message encrypted in Base64, which translated to:&lt;/p>
+&lt;p>{&amp;lsquo;success&amp;rsquo; : &amp;lsquo;great&amp;rsquo;,&lt;br>
+&amp;lsquo;colleague&amp;rsquo; : &amp;rsquo;esteemed&amp;rsquo;,&lt;br>
+&amp;rsquo;efforts&amp;rsquo; : &amp;lsquo;incredible&amp;rsquo;,&lt;br>
+&amp;lsquo;achievement&amp;rsquo; : &amp;lsquo;unlocked&amp;rsquo;,&lt;br>
+&amp;lsquo;rabbits&amp;rsquo; : &amp;lsquo;safe&amp;rsquo;,&lt;br>
+&amp;lsquo;foo&amp;rsquo; : &amp;lsquo;win!&amp;rsquo;}&lt;/p>
+&lt;p>I really enjoyed solving these problems &amp;ndash; thanks &lt;a href="https://www.linkedin.com/in/mathew-piotrowicz-aa4962137/" target="_blank" rel="noopener">Mathew&lt;/a> for the invite link!&lt;/p></description></item></channel></rss>

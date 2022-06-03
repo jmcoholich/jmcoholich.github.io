@@ -42,7 +42,14 @@ authors:
 
 <!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
 
-It is difficult to reproduce results in deep reinforcement learning ([relevant article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)).
+Outline of this post
+1. RL is a very exciting and promising field
+2. BUT its hard to reproduce results and hard to apply to new fields
+3. This blog post gives a list of tricks and lessons learned for beginners trying to write RL algorithms from scratch and/or apply RL algorithms to new tasks
+
+The list of tricks
+
+First of all, it is difficult to reproduce results in deep reinforcement learning ([Wired article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)).
 
 
 <!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
@@ -78,6 +85,7 @@ https://github.com/Denys88/rl_games
 For reference, nearly all of my work in RL has been using proximal policy optimization (PPO) for continuous control.
 
 
+Of course its impossible to cover everything, and new results in RL come out weekly. But I hope this is at least useful to someone starting out in the field of RL.
 
 
 TODO post this on the RL discord.

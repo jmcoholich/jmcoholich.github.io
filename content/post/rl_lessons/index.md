@@ -40,7 +40,16 @@ authors:
 #   - 教程
 ---
 
-It is difficult to reproduce results in deep reinforcement learning ([Wired article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)). I first started studying reinforcement learning (RL) in the summer of 2020, when I joined the [Robotics Perception and Learning Lab](https://faculty.cc.gatech.edu/~zk15/). I had been motivated by the amazing results achieved so far in board games, video games, and robotics and the promise of how powerful and general the methods are. While its trivial to clone a popular RL repository and run trianing on RL benchmarks, I found that on new problems or to implement RL algorithms from scratch is quite difficult, especially for a beginner(the best way to learn in my past experience).
+<!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
+
+It is difficult to reproduce results in deep reinforcement learning ([relevant article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)).
+
+
+<!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
+
+I first started studying reinforcement learning (RL) in the summer of 2020, when I joined the [Robotics Perception and Learning Lab](https://faculty.cc.gatech.edu/~zk15/). I was motivated by the how powerful and general the algorithms seemed and the results in [video games](https://arxiv.org/pdf/1312.5602) and especially in [robotics](https://arxiv.org/pdf/1812.11103.pdf) [Shadow Hand](https://openai.com/blog/learning-dexterity/).
+
+While it is trivial to clone a popular RL repository and train policies on existing benchmarks, implementing RL algorithms from scratch or succesfully applying RL to a new task or application domain is quite difficult.
 
 Understand the theory and academic papers behind an RL algorithm is essential to doing research, but not enough practically.
 

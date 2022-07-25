@@ -72,8 +72,8 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-**Update**: I am currently looking for a full-time position as a research or software engineer in machine learning.
-Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}.
+<!-- **Update**: I am currently looking for a full-time position as a research or software engineer in machine learning.
+Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 <!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 
 I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust is the application of reinforcement learning to robotics and legged locomotion. I am also interested in using learned priors to increase sample efficiency and decrease reward engineering required in reinforcement learning for real-world tasks.

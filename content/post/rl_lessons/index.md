@@ -46,26 +46,34 @@ Outline of this post
 1. RL is a very exciting and promising field
 2. BUT its hard to reproduce results and hard to apply to new fields
 3. This blog post gives a list of tricks and lessons learned for beginners trying to write RL algorithms from scratch and/or apply RL algorithms to new tasks
-
-The list of tricks
-
-First of all, it is difficult to reproduce results in deep reinforcement learning ([Wired article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)).
+<!--
+The list of tricks -->
+<!--
+First of all, it is difficult to reproduce results in deep reinforcement learning ([Wired article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)). -->
 
 
 <!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
 
-I began studying reinforcement learning (RL) in the summer of 2020, when I joined the [Robotics Perception and Learning Lab](https://faculty.cc.gatech.edu/~zk15/). I was motivated by the how powerful and general the algorithms seemed and the results in [video games](https://arxiv.org/pdf/1312.5602) and especially in [robotics](https://arxiv.org/pdf/1812.11103.pdf) [Shadow Hand](https://openai.com/blog/learning-dexterity/).
+Deep reinforcement learning (RL) is an exiciting area of study, but it can be difficult to [reproduce results] (https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/) in academic papers or successfully apply RL algorithms to new domains. One reason for this is the multitude of small tricks contained in many RL implementations that are essential for performance.
 
-While it is trivial to clone a popular RL repository and train policies on existing benchmarks, implementing RL algorithms from scratch or succesfully applying RL to a new task or application domain is quite difficult.
-
-Understand the theory and academic papers behind an RL algorithm is essential to doing research, but not enough practically.
-
-My issue was that even if I understood all the theory behind an RL algorithm, either from a paper or from Spinning Up, there were still many tricks required to get RL working in practice. To draw a parallel to supervised learning, it would be like understanding SGD and neural networks, but not having knowledge of batch norms or residual connections.
-
-Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff.
+When I first started studying RL, I implemented PPO, using only the psuedocode algorithm in the PPO paper as a reference. Things did not work well. I had to do all the small tricks. These tricks are the reasons that results differe so much between implementations, as explained in section A of [Deep RL that matters] (https://arxiv.org/pdf/1709.06560.pdf)
 
 
 This seems to be a somewhat common occurence in the field of RL, based off of my conversations with other students at Georgia Tech. [These](https://www.alexirpan.com/2018/02/14/rl-hard.html#:~:text=Often%2C%20it%20doesn't%2C,out%20of%20the%20RL%20algorithm.) blog [posts](https://andyljones.com/posts/rl-debugging.html) do a great job of explaining this and really resonate with my own experiences.
+
+ <!-- When I started in 2020, I had been motivated by cool results [in](https://openai.com/blog/learning-dexterity/) [robotics](https://arxiv.org/pdf/1812.11103.pdf and [video games](https://arxiv.org/pdf/1312.5602). The generality and power of deep RL algorithms seemed very promising compared to the domain-specific trajectory optimization algorithms for robotic locomotion that I had been previously studying. -->
+
+<!-- However, in doing RL research I quickly found that it was difficult to reproduce existing results or to apply RL to new tasks. -->
+
+
+<!-- I began studying reinforcement learning (RL) in the summer of 2020, when I joined the [Robotics Perception and Learning Lab](https://faculty.cc.gatech.edu/~zk15/). I was motivated by the how powerful and general the algorithms seemed and the results in [video games](https://arxiv.org/pdf/1312.5602) and especially in [robotics](https://arxiv.org/pdf/1812.11103.pdf) [Shadow Hand](https://openai.com/blog/learning-dexterity/). -->
+
+<!-- However, while it is trivial to clone a popular RL repository and train policies on existing benchmarks, implementing RL algorithms from scratch or succesfully applying RL to a new task or application domain is quite difficult. Reading academic papers and understand the theory behind why an algorithm works is an important part of research, but not enough for .
+
+My issue was that even if I understood all the theory behind an RL algorithm, either from a paper or from Spinning Up, there were still many tricks required to get RL working in practice. To draw a parallel to supervised learning, it would be like understanding SGD and neural networks, but not having knowledge of batch norms or residual connections.
+
+Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff. -->
+
 
 The purpose of this post is to enumerate the small tricks that I have discoverd during the past two years which make RL work or work better. Some of these "tricks" are will be obvious if you have experience in supervised deep learning, such as gradient clipping and input normalization. These are all things that are very important to getting this working, but are mundane enough that most of the time no one really tells you explicitly to make sure to do these things or they assume that you already know. They are roughly ordered in descending order of importance. Where possible, I have tried to include links to code in RL implementations where these tricks are found. I will additionally include a link to any help Pytorch functions for implementation.
 
@@ -95,6 +103,13 @@ I don't have ablation results on all of these.
 ### Using an existing RL Implementation and environment
 This is the main thing you should do instead of trying to code one from scratch. Take an existing implementation, play around with it, run some benchmarks. Then make a fork and start modifying the implementation for your own project. They will include their own set of tricks, and the creators have likely already tuned it a lot on RL benchmarks and provide default hyperparameter values that work decently well.
 
+Some suggestions:
+https://stable-baselines3.readthedocs.io/en/master/
+https://github.com/Denys88/rl_games
+https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail
+https://docs.ray.io/en/latest/rllib/index.html
+
+
 ### Observation Normalization and Clipping
 
 This was a big one, and should be somewhat obvious if you have a background in supervised learning.
@@ -121,7 +136,7 @@ Note: One common bug is the failure to save and load normailzation statistics in
 
 (dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps))
 
-Sparse rewards are difficult for RL algorithms to learn from, and an ongoing subject of research. If possible, try densifying your rewards.
+Sparse rewards are difficult for RL algorithms to learn from. A sparse rewards  If possible, try densifying your rewards.
 
 Give footstep example from my own work and from ALLSTEPS.
 

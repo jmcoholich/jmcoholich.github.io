@@ -117,9 +117,16 @@ Implementing an RL algorithm from scratch is an excellent way to learn. However,
 - [RLlib](https://docs.ray.io/en/latest/rllib/index.html)
 <!-- This is the main thing you should do instead of trying to code one from scratch. Take an existing implementation, play around with it, run some benchmarks. Then make a fork and start modifying the implementation for your own project. They will include their own set of tricks, and the creators have likely already tuned it a lot on RL benchmarks and provide default hyperparameter values that work decently well. -->
 
+
 Thanks to Elon Musk for helping me proofread and edit this post.
 
 TODO post this on the RL discord.
+
+Contents
+- [Observation and Normalization Clipping](#observation-normalization-and-clipping)
+- [Dense Rewards](#dense-rewards)
+- [Gradient Normalization and Clipping](#gradient-normalization-and-clipping)
+
 
 ### Observation Normalization and Clipping
 
@@ -150,7 +157,7 @@ Code examples
 PMTG, foot position instead of joints to avoid learning IK, make the outputs just deltas to a expert policy
  -->
 
-### A dense reward function
+### Dense Rewards
 
 (dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps))
 
@@ -247,11 +254,13 @@ Code for adaptive lr:
 
 
 ### bootstrapping good terminations
-I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well).
+I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance.
 
 This idea is this
 
 {{< math >}}$$ e^{i \pi}$${{< /math >}}
+
+I believe this is more necessary as your number of samples per update decreases.
 
 ### Generalized Advantage Estimation
 I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.

@@ -30,7 +30,10 @@ image:
   preview_only: false
 
 authors:
-  - admin
+  - adminner
+- order more liquid IV and kind bars
+- reschedule/cancel therapy
+- update resume
 
 # tags:
 #   - Academic
@@ -63,12 +66,18 @@ When I first started studying reinforcement learning (RL), I implemented [Proxim
 
 <!-- Where possible, I have tried to include links to code in RL implementations where these tricks are found. I will additionally include a link to any help Pytorch functions for implementation. -->
 
+In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Some of these things you really only need to worry about if you decide to write an RL algorithm from scratch, as most implementations will already include them. However, knowing of their existence will enable you to debug more effictively and make changes more intelligently. They are roughly ordered in descending order of importance.
 
-Through the entire process, I learned of a variety of small tricks and optimizations that are typically used to get RL algorithms working on complex environments.
-In the paper [Deep RL that matters](https://arxiv.org/pdf/1709.06560.pdf), the authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks. (They also expose a similar sensitivity to hyperparameters, network architecture, random seed, reward scale, and choice of environment -- RL is very finicky). I believe the different set of tricks included in each implementation is the primary cause of this inconsistency. Additionally, many of these tricks introduce their own hyperparameters.
+Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from [Deep RL that matters](https://arxiv.org/pdf/1709.06560.pdf). The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.
+
+<!-- (They also expose a similar sensitivity to hyperparameters, network architecture, random seed, reward scale, and choice of environment -- RL is very finicky). -->
+
+<!-- Different implementations include different sets of tricks -- and they really do make a difference. In -->
+
+<!-- Through the entire process, I learned of a variety of small tricks and optimizations that are typically used to get RL algorithms working on complex environments. -->
+<!-- I believe the different set of tricks included in each implementation is the primary cause of this inconsistency. Additionally, many of these tricks introduce their own hyperparameters. -->
 
 
-The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Some of these things you really only need to worry about if you decide to write an RL algorithm from scratch, as most implementations will already include them. However, knowing of their existence will enable you to debug more effictively and make changes more intelligently. They are roughly ordered in descending order of importance.
 
 
 <!-- Deep reinforcement learning (RL) is an exiciting area of study, but it can be difficult to [reproduce results](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/) in academic papers or successfully apply RL algorithms to new domains. Part of the issue is learning all the small tricks which are sometimes not disclosed and vary between impelemtations. -->
@@ -93,21 +102,17 @@ My issue was that even if I understood all the theory behind an RL algorithm, ei
 Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff. -->
 
 
-Of course, its impossible to cover everything, and RL is a super-hot field so there are new results monthly. Hopefully, this blog is at least useful to someone starting out like I was. Please don't hesitate to reach out to me if you think there is something important missing!
+Now for some disclaimers: Nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that I am missing. Also, RL is a super-hot field, so perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don't hesitate to reach out to me if you think there is something important missing!
 
 Most of the examples will come from either of these two RL implementations of which I am familair with:
 https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail
 https://github.com/Denys88/rl_games
 
-For reference, nearly all of my work in RL has been using on-policy algorithms for continuous control.
-
-TODO post this on the RL discord.
-
 <!-- I don't have ablation results on all of these. -->
 
 <!-- ### Using an existing RL Implementation and environment -->
 
-Implementing an RL algorithm from scratch is an excellent way to learn. However, if you need to get something working quickly, you should instead fork a popular repo. Here are some suggestions:
+Implementing an RL algorithm from scratch is an excellent way to learn. However, if you need to get something working quickly, you should instead just fork a popular repo. Here are some suggestions:
 
 - [Stable Baselines3](https://stable-baselines3.readthedocs.io/en/master/)
 - [RL Games](https://github.com/Denys88/rl_games)
@@ -117,21 +122,24 @@ Implementing an RL algorithm from scratch is an excellent way to learn. However,
 
 Thanks to Elon Musk for helping me proofread and edit this post.
 
+TODO post this on the RL discord.
 
 ### Observation Normalization and Clipping
 
-In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if your are learning a policy to control a robot, your observation could contain joint angles ranging from {{< math >}}$ -\frac{\pi}{2} ${{< /math >}} to {{< math >}}$ \frac{\pi}{2} ${{< /math >}} radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.
+In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from {{< math >}}$ -\frac{\pi}{2} ${{< /math >}} to {{< math >}}$ \frac{\pi}{2} ${{< /math >}} radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.
 
 The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling refers to mapping the data to the range {{< math >}}$ \left[0, 1\right] ${{< /math >}} by subtacting the min and dividing by the range.
 
-In supervised learning, statistics calculated over the training set are used to normalize each sample. In RL, this isn't possible because the dataset (consisting of interactions with the environment) is collected online and the statistics will change continuously. Because of this, you need to calculate an online mean and standard deviation. Most RL codebases use an implementation of [Welford's Online Algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm) like [this one](https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/running_mean_std.py) from Stable Baselines3.
+In supervised learning, statistics calculated over the training set are used to normalize each sample. In RL, this isn't possible because the dataset (consisting of interactions with the environment) is collected online and the statistics change continuously. Because of this, you need to calculate an online mean and standard deviation. Most RL codebases use an implementation of [Welford's Online Algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm) like [this one](https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/running_mean_std.py) from Stable Baselines3.
 
-Using an online mean and std typically causes an initial drop in performance as the mean and std initially move very quickly in the beginning due a small sample size and rapid exploration.
+This online approach is best when your algorithm needs to work on many different environments. Typically, this style of input normalization causes an initial drop in performance as the mean and standard deviation move very early in training due a small sample size and rapid exploration.
 
 ![pic](obs_norm_dip.png)
 <!-- Do this because optimization is much more effective when the different inputs are all the same scale, speeds up learning, and leads to faster convergence. Also avoid clipping to get rid of random or unexpected outliers, and because neural networks are bad at extrapolating. -->
 
-Alternatively, if you have good prior knowledge about the observations space, you can just rescale your data to the range [-1, 1], like what they do [here](https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212): That way you avoid computing an online mean and the warmup period. This may also be more stable wrt random seed, get out of local minima easier
+Alternatively, if you have good prior knowledge about the observations space, you can just rescale your data to the range [-1, 1] or [0, 1], like what they do [here](https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212).
+
+<!-- That way you avoid computing an online mean and the warmup period. This may also be more stable wrt random seed, get out of local minima easier -->
 
 <!-- Neural networks like nice smooth inputs and outputs. -->
 **Note:** A common bug when replaying trained policies is the failure to save and load normalization statistics. A policy network will not work during test time if the inputs are not preprocessed the same way they were during training.
@@ -166,9 +174,13 @@ Code examples:
 ### Reward Normalization and Clipping
 Typically, it is best not to have reward values that differ by many orders of magnitude. For example, in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), the authors clip all rewards to the range {{< math >}}$ \left[-1, 1\right] ${{< /math >}}.
 
+
 >Since the scale of scores varies greatly from game to game, we fixed all positive rewards to be 1 and all negative rewards to be −1, leaving 0 rewards unchanged. Clipping the rewards in this manner limits the scale of the error derivatives and makes it easier to use the same learning rate across multiple games. At the same time, it could affect the performance of our agent since it cannot differentiate between rewards of different magnitude.
 <br>
 >-- <cite>Mnih, Volodymyr, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. "Playing atari with deep reinforcement learning." arXiv preprint arXiv:1312.5602 (2013).</cite>
+
+In addition to just clipping the rewards, you can also keep a running mean and standard deviations of rewards to standardize rewards or returns (discounted rewards).
+
 
 ### Advantage Standardization
 Before calculating a loss for the policy network, advantages are computed and then standardized, such that about half of the advantages are positive and about half are negative. This is done for stability of training and variance reduction. Here is an excert from [HW2](http://rail.eecs.berkeley.edu/deeprlcourse-fa17/f17docs/hw2_final.pdf) of the Berkely Deep RL course:
@@ -191,8 +203,6 @@ RL is notoriously sensitive to hyperparameters and there is no one-size-fits all
 
 The good thing is, [Weights & Biases](https://wandb.ai/site) has a very good pipeline for doing automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
 [Check it out.](https://docs.wandb.ai/guides/sweeps)
-
-
 
 
 ### Value Network Loss Clipping

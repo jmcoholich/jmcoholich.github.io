@@ -30,10 +30,7 @@ image:
   preview_only: false
 
 authors:
-  - adminner
-- order more liquid IV and kind bars
-- reschedule/cancel therapy
-- update resume
+  - admin
 
 # tags:
 #   - Academic

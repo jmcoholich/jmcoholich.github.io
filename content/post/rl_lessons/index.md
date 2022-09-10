@@ -14,7 +14,7 @@ date: '2022-05-31T00:00:00Z'
 lastmod: '2022-05-31T00:00:00Z'
 
 # Is this an unpublished draft?
-draft: false
+draft: true
 
 # Show this page in the Featured widget?
 featured: false
@@ -264,4 +264,4 @@ In on-policy algorithms like TRPO and PPO, you have an entropy coeffient in the 
 
 Actually, I have often found this is uncessary, and don't really use it. For my work in legged locomotion, I found that an entropy coeffient of 0 works best (perhaps because the dynamics are chaotic enough that extra exploratio noise is not necesary.)
 
-
+Thanks for reading!

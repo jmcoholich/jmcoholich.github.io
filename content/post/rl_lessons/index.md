@@ -157,12 +157,23 @@ PMTG, foot position instead of joints to avoid learning IK, make the outputs jus
 
 (dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps))
 
-Sparse rewards are difficult for RL algorithms to learn from. If possible, try making your reward *dense*, meaning that at every timestep the agent recieves an informantive reward as a function of the current state, previous state, and action taken by the policy. For example, instead of rewarding an agent +1.0 for reaching a goal and 0.0 otherwise, try giving a reward at every timestep that is propotional to progress towards the goal. Of course, this requires some prior knowledge of what progress looks like and can limit what your policy discovers accordingly.
-Give footstep example from my own work and from ALLSTEPS.
+This tip will only be applicable if you are applying RL to a new task where you have the freedom to specify a reward function, rather than training on standard RL benchmarks where the reward function is part of the task.
 
+Sparse rewards are difficult for RL algorithms to learn from. If possible, try making your reward *dense*, meaning that at every timestep the agent recieves an informantive reward as a function of the current state, previous state, and action taken by the policy. For example, instead of rewarding an agent +1.0 for reaching a goal and 0.0 otherwise, try giving a reward at every timestep that is propotional to progress towards the goal. Of course, this requires some prior knowledge of what progress looks like and can limit what your policy discovers accordingly.
+
+For example, in the paper [ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills
+](https://arxiv.org/abs/2005.04323), the authors train a bipedal robot to hit a series of stepping stones. A naive reward design would give +1.0 if the robot's foot hit the center of the foot target, and 0.0 otherwise. Instead of doing this, the authors specify a reward function of
+
+{{< math >}}$$ r_{target} = k_{target}exp(-d/k_d) $${{< /math >}}
+
+where d is the distance from the foot to the target, and {{< math >}}$ k_{target}${{< /math >}} and {{< math >}}$k_d${{< /math >}} are hyperparameters. The authors explain:
+
+>In the initial stages of training, when the character makes contact with the target, the contact location may be far away from the center. Consequently, the gradient with respect to the target reward is large due to the exponential, which encourages the policy to move the foot closer to the center in the subsequent training iterations.
+
+Additionally, the authors reward robot center-of-mass velocity towards the next footsteps which further provides a progress signal.
 
 ### Gradient Normalization and Clipping
-This is another one that could be obvious if you have a background in supervised learning. Normalizing the gradient can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other trick for avoiding these issues include rewarding normalization and clipping, value function loss clipping, plus advantage standardization.
+This is another one that could be obvious if you have a background in supervised learning. Normalizing the gradient of the value and policy networks after each backward pass can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other tricks for avoiding these same issues include rewarding normalization and clipping, value function loss clipping, and advantage standardization.
 
 
 Code examples:

@@ -122,11 +122,18 @@ Thanks to Elon Musk for helping me proofread and edit this post.
 
 TODO post this on the RL discord.
 
-Contents
+Contents:
 - [Observation and Normalization Clipping](#observation-normalization-and-clipping)
 - [Dense Rewards](#dense-rewards)
 - [Gradient Normalization and Clipping](#gradient-normalization-and-clipping)
-
+- [Reward Normalization and Clipping](#reward-normalization-and-clipping)
+- [Advantage Standardization](#advantage-standardization)
+- [Hyperparameter Tuning](#hyperparameter-tuning)
+- [Value Network Loss Clipping](#value-network-loss-clipping)
+- [Learning Rate Scheduling](#learning-rate-scheduling)
+- [Bootstrapping Good Terminations](#bootstrapping-good-terminations)
+- [Generalized Advantage Estimation](#generalized-advantage-estimation)
+- [Entropy Decay](#entropy-decay)
 
 ### Observation Normalization and Clipping
 
@@ -282,24 +289,38 @@ $$ J_{\pi}(s_0) = \sum_{t = 0}^{h}\gamma^t r_t + \gamma^{h+1}V(s_{h+1}) $$
 
 I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance.
 
+"Good terminations" are terminations that were due to timeout or truncation ("good" because it wasn't the policy's fault that the episode terminated). A "bad" termination would be the episode ending due to failure.
+
 This idea is this
 
 I believe this is more necessary as your number of samples per update decreases.
 
 This bias-variance tradeoff controlling the amount of bootstrapping is a central idea in Generalized Advantage Estimation (GAE).
 
-If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation). <br>
+If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation).
+
+Code examples:
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L86
+    - In this computation, the tensor `self.bad_masks` indicates when bootstrapping should occur. If its value is 0, then the reward at the terminal timestep is replaced with the value estimate of the terminal state.
+- https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474
+    - As far as I can tell, RL Games does not do any bootstrapping of good terminations. I added bootstrapping to the function linked above in my own fork and found that performance actually decreased.
 
 ### Generalized Advantage Estimation
 GAE is from the paper [High-Dimensional Continuous Control Using
 Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf). I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
 
-https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73
+Code examples:
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73
+- https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474
+
 
 ### Entropy Decay
 The idea is simple: in the beginning you want more exploration. Towards the end you want more exploitation. This can help your agent avoid local optima early in training.
 In on-policy algorithms like TRPO and PPO, you have an entropy coeffient in the loss function for your policy net. You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration.
 
 Actually, I have often found this is uncessary, and don't really use it. For my work in legged locomotion, I found that an entropy coeffient of 0 works best (perhaps because the dynamics are chaotic enough that extra exploratio noise is not necesary.)
+
+Code example:
+- https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/schedulers.py#L54
 
 Thanks for reading!

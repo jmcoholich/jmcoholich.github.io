@@ -130,9 +130,9 @@ Contents
 
 ### Observation Normalization and Clipping
 
-In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from {{< math >}}$ -\frac{\pi}{2} ${{< /math >}} to {{< math >}}$ \frac{\pi}{2} ${{< /math >}} radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.
+In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from $ -\frac{\pi}{2} $ to $ \frac{\pi}{2} $ radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.
 
-The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling refers to mapping the data to the range {{< math >}}$ \left[0, 1\right] ${{< /math >}} by subtacting the min and dividing by the range.
+The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling refers to mapping the data to the range $ \left[0, 1\right] $ by subtacting the min and dividing by the range.
 
 In supervised learning, statistics calculated over the training set are used to normalize each sample. In RL, this isn't possible because the dataset (consisting of interactions with the environment) is collected online and the statistics change continuously. Because of this, you need to calculate an online mean and standard deviation. Most RL codebases use an implementation of [Welford's Online Algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm) like [this one](https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/running_mean_std.py) from Stable Baselines3.
 
@@ -168,9 +168,9 @@ Sparse rewards are difficult for RL algorithms to learn from. If possible, try m
 For example, in the paper [ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills
 ](https://arxiv.org/abs/2005.04323), the authors train a bipedal robot to hit a series of stepping stones. A naive reward design would give +1.0 if the robot's foot hit the center of the foot target, and 0.0 otherwise. Instead of doing this, the authors specify a reward function of
 
-{{< math >}}$$ r_{target} = k_{target}exp(-d/k_d) $${{< /math >}}
+$$ r_{target} = k_{target}exp(-d/k_d) $$
 
-where d is the distance from the foot to the target, and {{< math >}}$ k_{target}${{< /math >}} and {{< math >}}$k_d${{< /math >}} are hyperparameters. The authors explain:
+where d is the distance from the foot to the target, and $ k_{target}$ and $k_d$ are hyperparameters. The authors explain:
 
 >In the initial stages of training, when the character makes contact with the target, the contact location may be far away from the center. Consequently, the gradient with respect to the target reward is large due to the exponential, which encourages the policy to move the foot closer to the center in the subsequent training iterations.
 
@@ -187,7 +187,7 @@ Code examples:
 
 
 ### Reward Normalization and Clipping
-Typically, it is best not to have reward values that differ by many orders of magnitude. For example, in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), the authors clip all rewards to the range {{< math >}}$ \left[-1, 1\right] ${{< /math >}}.
+Typically, it is best not to have reward values that differ by many orders of magnitude. For example, in the paper [Playing Atari with Deep Reinforcement Learning](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf), the authors clip all rewards to the range $ \left[-1, 1\right] $.
 
 
 >Since the scale of scores varies greatly from game to game, we fixed all positive rewards to be 1 and all negative rewards to be −1, leaving 0 rewards unchanged. Clipping the rewards in this manner limits the scale of the error derivatives and makes it easier to use the same learning rate across multiple games. At the same time, it could affect the performance of our agent since it cannot differentiate between rewards of different magnitude.
@@ -267,18 +267,17 @@ In most training pipelines, the environment runs for a pre-specified number of s
 
 In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is applied to every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. The TD value update is given below.
 
-{{<math>}}$$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s') - V(s))$${{<\math>}}
+$$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s') - V(s))$$
 
-The target value for the value function is {{<math>}}$r + \gamma V(s') ${{<\math>}} where {{<math>}}$V(s')${{<\math>}} is the value function's estimate of the value of the next state. {{<math>}}$ \alpha ${{<\math>}}
-is a learning rate, and {{<math>}}$ \gamma ${{<\math>}} is the discount factor.
+The target value for the value function is $r + \gamma V(s') $ where $V(s')$ is the value function's estimate of the value of the next state. $ \alpha $ is a learning rate, and $ \gamma $ is the discount factor.
 
-In policy-gradient methods, the objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The estimate for a state {{<math>}}$$ s_0 $${{<\math>}} is given as:
+In policy-gradient methods, the objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The estimate for a state $$ s_0 $$ is given as:
 
-{{<math>}}$$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $${{<\math>}}
+$$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $$
 
-{{<math>}}$$ H $${{<\math>}} is te episode length. However, most of the time the sampling process gets terminated at {{<math>}}$ h < \infty ${{<\math>}} due to timeout, because its time for a policy update. If we know this is the case, we can bootstrap the final sample like so:
+$ H $ is the episode length. However, most of the time the sampling process gets terminated at $ h < H $ due to timeout, because its time for a policy update. If we know this is the case, we can bootstrap the final sample like so:
 
-{{<math>}}$$ rewards to go with bootstrap $${{<\math>}}
+$$ J_{\pi}(s_0) = \sum_{t = 0}^{h}\gamma^t r_t + \gamma^{h+1}V(s_{h+1}) $$
 
 
 I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance.

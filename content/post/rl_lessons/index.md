@@ -54,7 +54,7 @@ First of all, it is difficult to reproduce results in deep reinforcement learnin
 
 <!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
 
-When I first started studying reinforcement learning (RL), I implemented [Proximal Policy Optimization](https://arxiv.org/abs/1707.06347) from scratch using only the [psuedocode](https://spinningup.openai.com/en/latest/algorithms/ppo.html#pseudocode) on OpenAI's website. It didn't work and failed to obtain nearly any reward on most OpenAI Gym environments. It took a few more months of debugging, reading other RL implementations, and talking to colleagues to get things working. My conversations with other Georgia Tech students revealed that initially struggling to do basic things with RL was not uncommon. [These](https://www.alexirpan.com/2018/02/14/rl-hard.html#:~:text=Often%2C%20it%20doesn't%2C,out%20of%20the%20RL%20algorithm.) blog [posts](https://andyljones.com/posts/rl-debugging.html) do a great job of explaining the difficulty with RL and really resonate with my own experiences.
+When I first started studying reinforcement learning (RL), I implemented [Proximal Policy Optimization (PPO)](https://arxiv.org/abs/1707.06347) from scratch using only the [psuedocode](https://spinningup.openai.com/en/latest/algorithms/ppo.html#pseudocode) on OpenAI's website. It didn't work and failed to obtain nearly any reward on most OpenAI Gym environments. It took a few more months of debugging, reading other RL implementations, and talking to colleagues to get things working. My conversations with other Georgia Tech students revealed that initially struggling to do basic things with RL was not uncommon. [These](https://www.alexirpan.com/2018/02/14/rl-hard.html#:~:text=Often%2C%20it%20doesn't%2C,out%20of%20the%20RL%20algorithm.) blog [posts](https://andyljones.com/posts/rl-debugging.html) do a great job of explaining the difficulty with RL and really resonate with my own experiences.
 
 
 <!-- Some of these "tricks" are will be obvious if you have experience in supervised learning, such as gradient clipping and input normalization.  -->
@@ -65,7 +65,7 @@ When I first started studying reinforcement learning (RL), I implemented [Proxim
 
 In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Some of these things you really only need to worry about if you decide to write an RL algorithm from scratch, as most implementations will already include them. However, knowing of their existence will enable you to debug more effictively and make changes more intelligently. They are roughly ordered in descending order of importance.
 
-Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from [Deep RL that matters](https://arxiv.org/pdf/1709.06560.pdf). The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.
+Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from the paper [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf). The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.
 
 <!-- (They also expose a similar sensitivity to hyperparameters, network architecture, random seed, reward scale, and choice of environment -- RL is very finicky). -->
 
@@ -221,7 +221,7 @@ The good thing is, [Weights & Biases](https://wandb.ai/site) has a very good pip
 
 
 ### Value Network Loss Clipping
-This is another trick aimed at controlling the behavior. The mean-squared error loss that the value function is trained on is clipped from [-k, k] where k is usually around 0.2.
+This is another trick aimed at controlling the behavior of the gradients. The mean-squared error loss that the value function is trained on is clipped from [-k, k] where k is usually around 0.2.
 
 
 Code Examples:
@@ -253,17 +253,47 @@ Code for adaptive lr:
 <!-- ### ADAM optimizer -->
 
 
-### bootstrapping good terminations
+
+### Bootstrapping Good Terminations
+In most training pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns are calculated, this will appear as if the agent achieved zero reward for the rest of the episode. You can do updates like this. They are correct in expectation. However, this can introduce extra variance.
+
+"Bootstrapping" is a term that I see everywhere in RL. Here is the dictionary definition of bootstrap:
+
+>**Bootstrap (verb)**
+>1. get (oneself or something) into or out of a situation using existing resources. <br>
+>"the company is bootstrapping itself out of a marred financial past" <br>
+>
+>Source: [OxfordLanguages](https://languages.oup.com/google-dictionary-en/)
+
+In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is applied to every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. The TD value update is given below.
+
+{{<math>}}$$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s') - V(s))$${{<\math>}}
+
+The target value for the value function is {{<math>}}$r + \gamma V(s') ${{<\math>}} where {{<math>}}$V(s')${{<\math>}} is the value function's estimate of the value of the next state. {{<math>}}$ \alpha ${{<\math>}}
+is a learning rate, and {{<math>}}$ \gamma ${{<\math>}} is the discount factor.
+
+In policy-gradient methods, the objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The estimate for a state {{<math>}}$$ s_0 $${{<\math>}} is given as:
+
+{{<math>}}$$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $${{<\math>}}
+
+{{<math>}}$$ H $${{<\math>}} is te episode length. However, most of the time the sampling process gets terminated at {{<math>}}$ h < \infty ${{<\math>}} due to timeout, because its time for a policy update. If we know this is the case, we can bootstrap the final sample like so:
+
+{{<math>}}$$ rewards to go with bootstrap $${{<\math>}}
+
+
 I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance.
 
 This idea is this
 
-{{< math >}}$$ e^{i \pi}$${{< /math >}}
-
 I believe this is more necessary as your number of samples per update decreases.
 
+This bias-variance tradeoff controlling the amount of bootstrapping is a central idea in Generalized Advantage Estimation (GAE).
+
+If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation). <br>
+
 ### Generalized Advantage Estimation
-I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
+GAE is from the paper [High-Dimensional Continuous Control Using
+Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf). I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
 
 https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73
 

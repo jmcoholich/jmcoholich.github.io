@@ -131,7 +131,7 @@ Contents:
 - [Hyperparameter Tuning](#hyperparameter-tuning)
 - [Value Network Loss Clipping](#value-network-loss-clipping)
 - [Learning Rate Scheduling](#learning-rate-scheduling)
-- [Bootstrapping Good Terminations](#bootstrapping-good-terminations)
+- [Bootstrapping Timeout Terminations](#bootstrapping-timeout-terminations)
 - [Generalized Advantage Estimation](#generalized-advantage-estimation)
 - [Entropy Decay](#entropy-decay)
 
@@ -261,10 +261,10 @@ Code for adaptive lr:
 
 
 
-### Bootstrapping Good Terminations
-In most training pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns are calculated, this will appear as if the agent achieved zero reward for the rest of the episode. You can do updates like this. They are correct in expectation. However, this can introduce extra variance.
+### Bootstrapping Timeout Terminations
+In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means that the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns (discounted future rewards for every timestep) are calculated, the truncation make it seem as if the agent recieved zero reward for the rest of the episode. It is fine to perform updates like this, but learning may be slower, especially if you don't have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can help speed things up.
 
-"Bootstrapping" is a term that I see everywhere in RL. Here is the dictionary definition of bootstrap:
+The dictionary definition of bootstrap:
 
 >**Bootstrap (verb)**
 >1. get (oneself or something) into or out of a situation using existing resources. <br>
@@ -272,32 +272,39 @@ In most training pipelines, the environment runs for a pre-specified number of s
 >
 >Source: [OxfordLanguages](https://languages.oup.com/google-dictionary-en/)
 
-In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is applied to every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. The TD value update is given below.
+In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is done with every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. The TD value update is given below.
 
 $$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s') - V(s))$$
 
 The target value for the value function is $r + \gamma V(s') $ where $V(s')$ is the value function's estimate of the value of the next state. $ \alpha $ is a learning rate, and $ \gamma $ is the discount factor.
 
-In policy-gradient methods, the objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The estimate for a state $$ s_0 $$ is given as:
+<!-- In policy gradient methods, the objective is to -->
+The RL objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The estimate for a state $$ s_0 $$ is given as:
 
 $$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $$
 
-$ H $ is the episode length. However, most of the time the sampling process gets terminated at $ h < H $ due to timeout, because its time for a policy update. If we know this is the case, we can bootstrap the final sample like so:
+$ H $ is the episode length. However, when sampling process gets terminated at $ h < H $ due to timeout, we can bootstrap the final sample like so:
 
 $$ J_{\pi}(s_0) = \sum_{t = 0}^{h}\gamma^t r_t + \gamma^{h+1}V(s_{h+1}) $$
 
+Bootstrapping can help but it can also hurt. Its reduces variance in the computation of returns at the expense of introducing a bias from your function approximator (value network). Here are so excerpts from Sutton and Barto's textbook, where the authors place bootstrapping in the "Deadly Triad" of instability and divergence.
+> ...bootstrapping methods using function approximation may actually diverge to infinity.
+> ...Bootstrapping often results in faster learning because it allows learning to take advantage of the state property, the ability to recognize a state upon returning to it. On the other hand, bootstrapping can impair learning on problems where the state representation is poor and causes poor generalization.
+-- <cite> [Barto, Sutton. Reinforcement Learning: An Introduction. 2018](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) </cite>
 
-I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance.
 
-"Good terminations" are terminations that were due to timeout or truncation ("good" because it wasn't the policy's fault that the episode terminated). A "bad" termination would be the episode ending due to failure.
 
-This idea is this
+<!-- I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance. -->
 
-I believe this is more necessary as your number of samples per update decreases.
 
-This bias-variance tradeoff controlling the amount of bootstrapping is a central idea in Generalized Advantage Estimation (GAE).
 
-If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation).
+<!-- This idea is this
+
+I believe this is more necessary as your number of samples per update decreases. -->
+
+Controlling this bias-variance tradeoff with bootstrapping is a central idea in [Generalized Advantage Estimation (GAE)](#generalized-advantage-estimation).
+
+<!-- If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation). -->
 
 Code examples:
 - https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L86
@@ -305,9 +312,11 @@ Code examples:
 - https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474
     - As far as I can tell, RL Games does not do any bootstrapping of good terminations. I added bootstrapping to the function linked above in my own fork and found that performance actually decreased.
 
+
 ### Generalized Advantage Estimation
-GAE is from the paper [High-Dimensional Continuous Control Using
-Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf). I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
+You basically tune the amount of bootstrapping in a bias- varaince tradeoff. More bootstrapping is lower variance but introduces bias from your function approximator.
+
+GAE is from the paper [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf). I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
 
 Code examples:
 - https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73

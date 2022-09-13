@@ -78,11 +78,11 @@ Different RL implementations will include a slightly different set of tricks. As
 
 
 <!-- Deep reinforcement learning (RL) is an exiciting area of study, but it can be difficult to [reproduce results](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/) in academic papers or successfully apply RL algorithms to new domains. Part of the issue is learning all the small tricks which are sometimes not disclosed and vary between impelemtations. -->
+<p>
+<img src=fig_6_drl_that_matters.png width=75%>
 
-
-![pic](fig_6_drl_that_matters.png)
-*Figure 6 from [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf) plotting the performance of different RL implementations, averaged over 5 random seeds*
-
+<em>Figure 6 from [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf) plotting the performance of different RL implementations, averaged over 5 random seeds</em>
+</p>
 
 
  <!-- When I started in 2020, I had been motivated by cool results [in](https://openai.com/blog/learning-dexterity/) [robotics](https://arxiv.org/pdf/1812.11103.pdf and [video games](https://arxiv.org/pdf/1312.5602). The generality and power of deep RL algorithms seemed very promising compared to the domain-specific trajectory optimization algorithms for robotic locomotion that I had been previously studying. -->
@@ -173,7 +173,11 @@ This tip will only be applicable if you are applying RL to a new task where you 
 
 Sparse rewards are difficult for RL algorithms to learn from. If possible, try making your reward *dense*, meaning that at every timestep the agent recieves an informantive reward as a function of the current state, previous state, and action taken. For example, instead of rewarding an agent +1.0 for reaching a goal and 0.0 otherwise, try giving a reward at every timestep that is propotional to progress towards the goal. Of course, this requires some prior knowledge of what progress looks like and can limit the types of solutions that your policy discovers.
 
+<p>
+<img src=allsteps.png width=50%>
 
+<em>Figure 3 from [ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills](https://arxiv.org/abs/2005.04323) depicting the stepping-stone task</em>
+</p>
 
 For example, in the paper [ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills](https://arxiv.org/abs/2005.04323), the authors train a bipedal robot to hit a series of stepping stones. A naive reward design would give +1.0 if the robot's foot hit the center of the foot target (depicted above), and 0.0 otherwise. Instead of doing this, the authors specify a reward function of
 
@@ -183,7 +187,7 @@ where d is the distance from the foot to the target, and $ k_{target}$ and $k_d$
 
 >In the initial stages of training, when the character makes contact with the target, the contact location may be far away from the center. Consequently, the gradient with respect to the target reward is large due to the exponential, which encourages the policy to move the foot closer to the center in the subsequent training iterations.
 
-Additionally, the authors reward robot center-of-mass velocity towards the next footsteps which further provides a progress signal.
+Without the dense reward, there would be no reward gradient across the state space like this.
 
 ### Gradient Normalization and Clipping
 This is another one that could be obvious if you have a background in supervised learning. Normalizing the gradient of the value and policy networks after each backward pass can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other tricks for avoiding these same issues include rewarding normalization and clipping, value function loss clipping, and advantage standardization.
@@ -205,6 +209,12 @@ Typically, it is best not to have reward values that differ by many orders of ma
 
 In addition to just clipping the rewards, you can also keep a running mean and standard deviations of rewards to standardize rewards or returns (discounted rewards).
 
+Code examples:
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/model.py
+    - rewards are processed by these two environment wrappers from Stable Baselines3
+    - https://stable-baselines3.readthedocs.io/en/master/common/atari_wrappers.html#stable_baselines3.common.atari_wrappers.ClipRewardEnv
+    - https://stable-baselines3.readthedocs.io/en/master/guide/vec_envs.html#stable_baselines3.common.vec_env.VecNormalize.normalize_reward
+
 
 ### Advantage Standardization
 Before calculating a loss for the policy network, advantages are computed and then standardized, such that about half of the advantages are positive and about half are negative. This is done for stability of training and variance reduction. Here is an excert from [HW2](http://rail.eecs.berkeley.edu/deeprlcourse-fa17/f17docs/hw2_final.pdf) of the Berkely Deep RL course:
@@ -223,14 +233,23 @@ Code Examples
 
 
 ### Hyperparameter Tuning
-RL is notoriously sensitive to hyperparameters and there is no one-size-fits all for good hyperparameter values. Typically, different implementations and different applications will need different hyperparameters. This is a major complaint about RL.
+RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all for good hyperparameter values. Typically, different implementations and different applications will need different hyperparameters. Here are just a few hyperparameters that could make a difference:
 
-The good thing is, [Weights & Biases](https://wandb.ai/site) has a very good pipeline for doing automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
+- reward function term coefficients
+- number of policy updates / samples per update
+- learning rate
+- entropy coefficient
+- network architecture
+- epochs and minibatch size for policy updates
+- clipping values for gradients, rewards, values, observations, gradients
+
+
+The good thing is [Weights & Biases](https://wandb.ai/site) has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
 [Check it out.](https://docs.wandb.ai/guides/sweeps)
 
 
 ### Value Network Loss Clipping
-This is another trick aimed at controlling the behavior of the gradients. The mean-squared error loss that the value function is trained on is clipped from [-k, k] where k is usually around 0.2.
+This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error loss where the target values are value estimates from policy rollouts. Due to the unpredictable nature of collecting these rollouts, especially when few samples are collected, the target values could contain unexpected values. Due to this, the MSE loss is sometimes clipped from [-k, k] where k is usually around 0.2.
 
 
 Code Examples:
@@ -260,8 +279,6 @@ Code for adaptive lr:
 
 
 <!-- ### ADAM optimizer -->
-
-
 
 ### Bootstrapping Timeout Terminations
 In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means that the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns (discounted future rewards for every timestep) are calculated, the truncation make it seem as if the agent recieved zero reward for the rest of the episode. It is fine to perform updates like this, but learning may be slower, especially if you don't have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can help speed things up.

@@ -314,9 +314,13 @@ Code examples:
 
 
 ### Generalized Advantage Estimation
-You basically tune the amount of bootstrapping in a bias- varaince tradeoff. More bootstrapping is lower variance but introduces bias from your function approximator.
+Generalized Advantage Estimation (GAE), from the paper from the paper [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf), provides a continuous bias-variance tradeoff through controlling the amount of bootstrapping via a parameter $\lambda$. The formula for computing advantages is given below, but I highly recommend reading the actual paper if you are going to program this yourself.
 
-GAE is from the paper [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf). I have found GAE is useful in improving performance. Its just another knob to turn. In most training runs, I set gamma to 0.99 and lambda = 0.95. The lambda parameters can be though of as a factor used control the amount of bootstrapping. 0 is no bootstrapping, where 1 is td-learning (lots of bootstrapping). As you increase the number of samples per iteration, you will perform better with lambda set to 1.
+{{<math>}}$$ \hat{A}^{GAE(\gamma, \lambda)}_t = \sum^\infty_{l=0} (\gamma \lambda)^l \delta^V_{t+l} $$ {{</math>}}
+
+{{<math>}}$$\delta_{t}^V = r_t + \gamma V(s_{t+1}) -V(s_t)$${{</math>}}
+
+The TD-learning value update is a special case of GAE when $\lambda = 0$. When $\lambda = 1$, no bootstrapping occurs. In most training runs, I set gamma to 0.99 and lambda = 0.95.
 
 Code examples:
 - https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73
@@ -324,10 +328,13 @@ Code examples:
 
 
 ### Entropy Decay
-The idea is simple: in the beginning you want more exploration. Towards the end you want more exploitation. This can help your agent avoid local optima early in training.
+The exploration-exploitation tradeoff is a fundamental problem in RL which usually involves some experimentation or hyperparamter tuning to get right. One of the primary ways to control entropy is through an entropy term in the policy loss function. If your policy outputs to a Gaussian distribution over actions, the entropy loss acts on the variance of that distribution.
+
+Generally, you want exploration early in training and exploration later.
+
 In on-policy algorithms like TRPO and PPO, you have an entropy coeffient in the loss function for your policy net. You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration.
 
-Actually, I have often found this is uncessary, and don't really use it. For my work in legged locomotion, I found that an entropy coeffient of 0 works best (perhaps because the dynamics are chaotic enough that extra exploratio noise is not necesary.)
+Actually, I have often found this is uncessary, and don't really use it. For my work in legged locomotion, I found that an entropy coeffient of 0 works best (perhaps because the underactuated hybrid dynamics of a legged robot chaotic enough that extra exploratio noise is not necesary.)
 
 Code example:
 - https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/schedulers.py#L54

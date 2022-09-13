@@ -328,15 +328,21 @@ Code examples:
 
 
 ### Entropy Decay
-The exploration-exploitation tradeoff is a fundamental problem in RL which usually involves some experimentation or hyperparamter tuning to get right. One of the primary ways to control entropy is through an entropy term in the policy loss function. If your policy outputs to a Gaussian distribution over actions, the entropy loss acts on the variance of that distribution.
+The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want exploration early in training and exploitation later. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during training rollouts. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying desired entropy to zero may yield the desired the exploration-explotation behavior.
 
-Generally, you want exploration early in training and exploration later.
 
-In on-policy algorithms like TRPO and PPO, you have an entropy coeffient in the loss function for your policy net. You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration.
+In my own work in legged locomotion, I have often found this uncessary. The majority of the time, I use PPO and set the entropy coefficient to 0.0 for the entirety of training. Perhaps the chaotic underactuated dynamics of a legged robot eliminates the need for extra exploration noise.
 
-Actually, I have often found this is uncessary, and don't really use it. For my work in legged locomotion, I found that an entropy coeffient of 0 works best (perhaps because the underactuated hybrid dynamics of a legged robot chaotic enough that extra exploratio noise is not necesary.)
+<!-- you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
 
-Code example:
+Code example for PPO:
 - https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/schedulers.py#L54
+<!-- One of the primary ways to control entropy is through an entropy term in the policy loss function. If your policy outputs to a Gaussian distribution over actions, the entropy loss acts on the variance of that distribution. -->
+
+<!--
+
+ You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
+
+
 
 Thanks for reading!

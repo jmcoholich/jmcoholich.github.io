@@ -42,10 +42,10 @@ authors:
 
 <!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
 
-Outline of this post
+<!-- Outline of this post
 1. RL is a very exciting and promising field
 2. BUT its hard to reproduce results and hard to apply to new fields
-3. This blog post gives a list of tricks and lessons learned for beginners trying to write RL algorithms from scratch and/or apply RL algorithms to new tasks
+3. This blog post gives a list of tricks and lessons learned for beginners trying to write RL algorithms from scratch and/or apply RL algorithms to new tasks -->
 <!--
 The list of tricks -->
 <!--
@@ -63,7 +63,7 @@ When I first started studying reinforcement learning (RL), I implemented [Proxim
 
 <!-- Where possible, I have tried to include links to code in RL implementations where these tricks are found. I will additionally include a link to any help Pytorch functions for implementation. -->
 
-In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Some of these things you really only need to worry about if you decide to write an RL algorithm from scratch, as most implementations will already include them. However, knowing of their existence will enable you to debug more effictively and make changes more intelligently. They are roughly ordered in descending order of importance.
+In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Knowledge of some of these tricks is only necessary if you are implementing an RL algorithm from scratch, as most public implementations will already include them. However, knowing of their existence will enable you to debug more effictively and make changes more intelligently. They are roughly ordered in descending order of importance.
 
 Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from the paper [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf). The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.
 
@@ -99,11 +99,11 @@ My issue was that even if I understood all the theory behind an RL algorithm, ei
 Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff. -->
 
 
-Now for some disclaimers: Nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that I am missing. Also, RL is a super-hot field, so perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don't hesitate to reach out to me if you think there is something important missing!
+Now for some disclaimers: Nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that are missing. Also, RL is a super-hot field and perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don't hesitate to reach out to me if you think there is something important missing!
 
-Most of the examples will come from either of these two RL implementations of which I am familair with:
-https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail
-https://github.com/Denys88/rl_games
+Most of the examples will come from either of these two RL implementations which I am familair with:
+- [pytorch-a2c-ppo-acktr-gail](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail)
+- [RL Games](https://github.com/Denys88/rl_games)
 
 <!-- I don't have ablation results on all of these. -->
 
@@ -118,9 +118,8 @@ Implementing an RL algorithm from scratch is an excellent way to learn. However,
 <!-- This is the main thing you should do instead of trying to code one from scratch. Take an existing implementation, play around with it, run some benchmarks. Then make a fork and start modifying the implementation for your own project. They will include their own set of tricks, and the creators have likely already tuned it a lot on RL benchmarks and provide default hyperparameter values that work decently well. -->
 
 
-Thanks to Elon Musk for helping me proofread and edit this post.
 
-TODO post this on the RL discord.
+<!-- TODO post this on the RL discord. -->
 
 Contents:
 - [Observation and Normalization Clipping](#observation-normalization-and-clipping)
@@ -135,20 +134,22 @@ Contents:
 - [Generalized Advantage Estimation](#generalized-advantage-estimation)
 - [Entropy Decay](#entropy-decay)
 
+Thanks to Elon Musk for helping me proofread and edit this post.
+
 ### Observation Normalization and Clipping
 
 In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from $ -\frac{\pi}{2} $ to $ \frac{\pi}{2} $ radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.
 
-The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling refers to mapping the data to the range $ \left[0, 1\right] $ by subtacting the min and dividing by the range.
+The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling refers to mapping the data to the range $ \left[0, 1\right] $ by subtacting the min and dividing by the range. In either case, clipping should also be applied after normalization. Neural networks are bad at extrapolation, and outliers can produce unexpected outputs. In my work, observations are clipped to $[-5.0, 5.0]$ after standardization.
 
 In supervised learning, statistics calculated over the training set are used to normalize each sample. In RL, this isn't possible because the dataset (consisting of interactions with the environment) is collected online and the statistics change continuously. Because of this, you need to calculate an online mean and standard deviation. Most RL codebases use an implementation of [Welford's Online Algorithm](https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford's_online_algorithm) like [this one](https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/running_mean_std.py) from Stable Baselines3.
 
-This online approach is best when your algorithm needs to work on many different environments. Typically, this style of input normalization causes an initial drop in performance as the mean and standard deviation move very early in training due a small sample size and rapid exploration.
+This online approach is best when your algorithm needs to work on many different environments. However, it often causes an initial drop in performance (red circle below) as the mean and standard deviation move quickly early in training due a small sample size and rapid exploration.
 
 ![pic](obs_norm_dip.png)
 <!-- Do this because optimization is much more effective when the different inputs are all the same scale, speeds up learning, and leads to faster convergence. Also avoid clipping to get rid of random or unexpected outliers, and because neural networks are bad at extrapolating. -->
 
-Alternatively, if you have good prior knowledge about the observations space, you can just rescale your data to the range [-1, 1] or [0, 1], like what they do [here](https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212).
+Alternatively, if you have good prior knowledge about the bounds of the observations space, you can just rescale your data to the range [-1, 1] or [0, 1], like what they do [here](https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212).
 
 <!-- That way you avoid computing an online mean and the warmup period. This may also be more stable wrt random seed, get out of local minima easier -->
 
@@ -158,7 +159,7 @@ Alternatively, if you have good prior knowledge about the observations space, yo
 Code examples
 - https://github.com/Denys88/rl_games/blob/06a3319d3a6af566d984aa5953b1fd7a24a8e3a4/rl_games/common/a2c_common.py#L587
 - https://github.com/Denys88/rl_games/blob/94e55563be60f10e659428cdce7b4e0bd131d471/rl_games/algos_torch/models.py#L41
-
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/envs.py#L193
 
 <!-- ### Simplify the action space and add prior knowedge
 PMTG, foot position instead of joints to avoid learning IK, make the outputs just deltas to a expert policy
@@ -166,7 +167,7 @@ PMTG, foot position instead of joints to avoid learning IK, make the outputs jus
 
 ### Dense Rewards
 
-(dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps))
+<!-- (dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps)) -->
 
 This tip will only be applicable if you are applying RL to a new task where you have the freedom to specify a reward function, rather than training on standard RL benchmarks where the reward function is part of the task.
 

@@ -1,4 +1,272 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link><atom:link href="https://jmcoholich.github.io/index.xml" rel="self" type="application/rss+xml"/><description>Jeremiah Coholich</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Tue, 31 May 2022 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link></image><item><title>I Completed the Google Foobar Challenge</title><link>https://jmcoholich.github.io/post/google_foobar/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/google_foobar/</guid><description>&lt;!-- ## Here's what the challenge is -->
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link><atom:link href="https://jmcoholich.github.io/index.xml" rel="self" type="application/rss+xml"/><description>Jeremiah Coholich</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Tue, 31 May 2022 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link></image><item><title>A Bag of Tricks for Deep Reinforcement Learning</title><link>https://jmcoholich.github.io/post/rl_lessons/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/rl_lessons/</guid><description>&lt;!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
+&lt;!-- Outline of this post
+1. RL is a very exciting and promising field
+2. BUT its hard to reproduce results and hard to apply to new fields
+3. This blog post gives a list of tricks and lessons learned for beginners trying to write RL algorithms from scratch and/or apply RL algorithms to new tasks -->
+&lt;!--
+The list of tricks -->
+&lt;!--
+First of all, it is difficult to reproduce results in deep reinforcement learning ([Wired article](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/)). -->
+&lt;!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
+&lt;p>When I first started studying reinforcement learning (RL), I implemented &lt;a href="https://arxiv.org/abs/1707.06347" target="_blank" rel="noopener">Proximal Policy Optimization (PPO)&lt;/a> from scratch using only the &lt;a href="https://spinningup.openai.com/en/latest/algorithms/ppo.html#pseudocode" target="_blank" rel="noopener">psuedocode&lt;/a> on OpenAI&amp;rsquo;s website. It didn&amp;rsquo;t work and failed to obtain nearly any reward on most OpenAI Gym environments. It took a few more months of debugging, reading other RL implementations, and talking to colleagues to get things working. My conversations with other Georgia Tech students revealed that initially struggling to do basic things with RL was not uncommon. &lt;a href="https://www.alexirpan.com/2018/02/14/rl-hard.html#:~:text=Often%2C%20it%20doesn%27t%2C,out%20of%20the%20RL%20algorithm." target="_blank" rel="noopener">These&lt;/a> blog &lt;a href="https://andyljones.com/posts/rl-debugging.html" target="_blank" rel="noopener">posts&lt;/a> do a great job of explaining the difficulty with RL and really resonate with my own experiences.&lt;/p>
+&lt;!-- Some of these "tricks" are will be obvious if you have experience in supervised learning, such as gradient clipping and input normalization. -->
+&lt;!-- These are all things that are very important to getting this working, but are mundane enough that most of the time no one really tells you explicitly to make sure to do these things or they assume that you already know. -->
+&lt;!-- Where possible, I have tried to include links to code in RL implementations where these tricks are found. I will additionally include a link to any help Pytorch functions for implementation. -->
+&lt;p>In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Knowledge of some of these tricks is only necessary if you are implementing an RL algorithm from scratch, as most public implementations will already include them. However, knowing of their existence will enable you to debug more effectively and make changes more intelligently. They are roughly ordered in descending order of importance.&lt;/p>
+&lt;p>Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from the paper &lt;a href="https://arxiv.org/pdf/1709.06560.pdf" target="_blank" rel="noopener">Deep Reinforcement Learning that Matters&lt;/a>. The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.&lt;/p>
+&lt;!-- (They also expose a similar sensitivity to hyperparameters, network architecture, random seed, reward scale, and choice of environment -- RL is very finicky). -->
+&lt;!-- Different implementations include different sets of tricks -- and they really do make a difference. In -->
+&lt;!-- Through the entire process, I learned of a variety of small tricks and optimizations that are typically used to get RL algorithms working on complex environments. -->
+&lt;!-- I believe the different set of tricks included in each implementation is the primary cause of this inconsistency. Additionally, many of these tricks introduce their own hyperparameters. -->
+&lt;!-- Deep reinforcement learning (RL) is an exiciting area of study, but it can be difficult to [reproduce results](https://www.wired.com/story/artificial-intelligence-confronts-reproducibility-crisis/) in academic papers or successfully apply RL algorithms to new domains. Part of the issue is learning all the small tricks which are sometimes not disclosed and vary between impelemtations. -->
+&lt;p>
+&lt;img src=fig_6_drl_that_matters.png width=75%>
+&lt;p>&lt;em>Figure 6 from &lt;a href="https://arxiv.org/pdf/1709.06560.pdf" target="_blank" rel="noopener">Deep Reinforcement Learning that Matters&lt;/a>, plotting the performance of different RL implementations averaged over 5 random seeds&lt;/em>&lt;/p>
+&lt;/p>
+&lt;!-- When I started in 2020, I had been motivated by cool results [in](https://openai.com/blog/learning-dexterity/) [robotics](https://arxiv.org/pdf/1812.11103.pdf and [video games](https://arxiv.org/pdf/1312.5602). The generality and power of deep RL algorithms seemed very promising compared to the domain-specific trajectory optimization algorithms for robotic locomotion that I had been previously studying. -->
+&lt;!-- However, in doing RL research I quickly found that it was difficult to reproduce existing results or to apply RL to new tasks. -->
+&lt;!-- I began studying reinforcement learning (RL) in the summer of 2020, when I joined the [Robotics Perception and Learning Lab](https://faculty.cc.gatech.edu/~zk15/). I was motivated by the how powerful and general the algorithms seemed and the results in [video games](https://arxiv.org/pdf/1312.5602) and especially in [robotics](https://arxiv.org/pdf/1812.11103.pdf) [Shadow Hand](https://openai.com/blog/learning-dexterity/). -->
+&lt;!-- However, while it is trivial to clone a popular RL repository and train policies on existing benchmarks, implementing RL algorithms from scratch or succesfully applying RL to a new task or application domain is quite difficult. Reading academic papers and understand the theory behind why an algorithm works is an important part of research, but not enough for .
+My issue was that even if I understood all the theory behind an RL algorithm, either from a paper or from Spinning Up, there were still many tricks required to get RL working in practice. To draw a parallel to supervised learning, it would be like understanding SGD and neural networks, but not having knowledge of batch norms or residual connections.
+Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff. -->
+&lt;p>Now for some disclaimers: Nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that are missing. Also, RL is a super-hot field and perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don&amp;rsquo;t hesitate to reach out to me if you think there is something important missing!&lt;/p>
+&lt;p>Most of the examples will come from either of these two RL implementations which I am familair with:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- I don't have ablation results on all of these. -->
+&lt;!-- ### Using an existing RL Implementation and environment -->
+&lt;p>Implementing an RL algorithm from scratch is an excellent way to learn. However, if you just need to get something working quickly, you should instead just fork a popular repo and start from there. Here are some suggestions:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://stable-baselines3.readthedocs.io/en/master/" target="_blank" rel="noopener">Stable Baselines3&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://docs.ray.io/en/latest/rllib/index.html" target="_blank" rel="noopener">RLlib&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- This is the main thing you should do instead of trying to code one from scratch. Take an existing implementation, play around with it, run some benchmarks. Then make a fork and start modifying the implementation for your own project. They will include their own set of tricks, and the creators have likely already tuned it a lot on RL benchmarks and provide default hyperparameter values that work decently well. -->
+&lt;!-- TODO post this on the RL discord. -->
+&lt;p>Contents:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="#observation-normalization-and-clipping">Observation and Normalization Clipping&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#dense-rewards">Dense Rewards&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#hyperparameter-tuning">Hyperparameter Tuning&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#gradient-normalization-and-clipping">Gradient Normalization and Clipping&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#reward-normalization-and-clipping">Reward Normalization and Clipping&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#advantage-standardization">Advantage Standardization&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#bootstrapping-timeout-terminations">Bootstrapping Timeout Terminations&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#generalized-advantage-estimation">Generalized Advantage Estimation&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#entropy-decay">Entropy Decay&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#value-network-loss-clipping">Value Network Loss Clipping&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#learning-rate-scheduling">Learning Rate Scheduling&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Thanks to Elon Musk for helping me proofread and edit this post.&lt;/p>
+&lt;h3 id="observation-normalization-and-clipping">Observation Normalization and Clipping&lt;/h3>
+&lt;p>In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from $ -\frac{\pi}{2} $ to $ \frac{\pi}{2} $ radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.&lt;/p>
+&lt;p>The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling means mapping the data to the range $ \left[0, 1\right] $ by subtacting the min and dividing by the range. In either case, clipping should also be applied after normalization. Neural networks are bad at extrapolation, and outliers can produce unexpected outputs. In my work, observations are clipped to $[-5.0, 5.0]$ after standardization.&lt;/p>
+&lt;p>In supervised learning, statistics calculated over the training set are used to normalize each sample. In RL, this isn&amp;rsquo;t possible because the dataset (consisting of interactions with the environment) is collected online and the statistics change continuously. Because of this, you need to calculate an online mean and standard deviation. Most RL codebases use an implementation of &lt;a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Welford%27s_online_algorithm" target="_blank" rel="noopener">Welford&amp;rsquo;s Online Algorithm&lt;/a> like &lt;a href="https://github.com/DLR-RM/stable-baselines3/blob/master/stable_baselines3/common/running_mean_std.py" target="_blank" rel="noopener">this one&lt;/a> from Stable Baselines3.&lt;/p>
+&lt;p>This online approach is best when your algorithm needs to work on many different environments. However, it often causes an initial drop in performance (red circle below) as the mean and standard deviation move rapidly early in training due a small sample size and exploration.&lt;/p>
+&lt;p>
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img alt="pic" srcset="
+/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp 400w,
+/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_f3c994e5b8222cfd49a9dd4f22fd932e.webp 760w,
+/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
+src="https://jmcoholich.github.io/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp"
+width="760"
+height="380"
+loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;/p>
+&lt;!-- Do this because optimization is much more effective when the different inputs are all the same scale, speeds up learning, and leads to faster convergence. Also avoid clipping to get rid of random or unexpected outliers, and because neural networks are bad at extrapolating. -->
+&lt;p>Alternatively, if you have good prior knowledge about the bounds of the observation space, you can just rescale your data to the range [-1, 1] or [0, 1], like what they do &lt;a href="https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212" target="_blank" rel="noopener">here&lt;/a>.&lt;/p>
+&lt;!-- That way you avoid computing an online mean and the warmup period. This may also be more stable wrt random seed, get out of local minima easier -->
+&lt;!-- Neural networks like nice smooth inputs and outputs. -->
+&lt;p>&lt;strong>Note:&lt;/strong> A common bug when replaying trained policies is the failure to save and load normalization statistics. A policy network will not work during test time if the inputs are not preprocessed the same way they were during training.&lt;/p>
+&lt;p>Code examples&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/06a3319d3a6af566d984aa5953b1fd7a24a8e3a4/rl_games/common/a2c_common.py#L587" target="_blank" rel="noopener">RL Games 1&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/94e55563be60f10e659428cdce7b4e0bd131d471/rl_games/algos_torch/models.py#L41" target="_blank" rel="noopener">RL Games 2&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/envs.py#L193" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- ### Simplify the action space and add prior knowedge
+PMTG, foot position instead of joints to avoid learning IK, make the outputs just deltas to a expert policy
+-->
+&lt;h3 id="dense-rewards">Dense Rewards&lt;/h3>
+&lt;!-- (dense = every timestep, smooth = varies smoothly between regions of the state space (ie gradual change vs large steps)) -->
+&lt;p>This tip will only be applicable if you are applying RL to a new task where you have the freedom to specify a reward function, rather than training on standard RL benchmarks where the reward function is part of the task.&lt;/p>
+&lt;p>Sparse rewards are difficult for RL algorithms to learn from. If possible, try making your reward &lt;em>dense&lt;/em>, meaning that at every timestep the agent recieves an informantive reward as a function of the current state, previous state, and action taken. For example, instead of rewarding an agent +1.0 for reaching a goal and 0.0 otherwise, try giving a reward at every timestep that is propotional to progress towards the goal. Of course, this requires some prior knowledge of what progress looks like and can limit the types of solutions that your policy discovers.&lt;/p>
+&lt;p>
+&lt;img src=allsteps.png width=50%>
+&lt;p>&lt;em>Figure 3 from &lt;a href="https://arxiv.org/abs/2005.04323" target="_blank" rel="noopener">ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills&lt;/a> depicting the stepping-stone task&lt;/em>&lt;/p>
+&lt;/p>
+&lt;p>For example, in the paper &lt;a href="https://arxiv.org/abs/2005.04323" target="_blank" rel="noopener">ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills&lt;/a>, the authors train a bipedal robot to hit a series of stepping stones. A naive reward design would give +1.0 if the robot&amp;rsquo;s foot hit the center of the foot target (depicted above), and 0.0 otherwise. Instead of doing this, the authors specify a reward function of&lt;/p>
+&lt;p>$$ r_{target} = k_{target}\exp(-d/k_d) $$&lt;/p>
+&lt;p>where $d$ is the distance from the foot to the target, and $ k_{target}$ and $k_d$ are hyperparameters. The authors explain:&lt;/p>
+&lt;blockquote>
+&lt;p>In the initial stages of training, when the character makes contact with the target, the contact location may be far away from the center. Consequently, the gradient with respect to the target reward is large due to the exponential, which encourages the policy to move the foot closer to the center in the subsequent training iterations.&lt;/p>
+&lt;/blockquote>
+&lt;p>Without the dense reward, there would be no reward gradient across the state space, which slows the rate of learning.&lt;/p>
+&lt;h3 id="hyperparameter-tuning">Hyperparameter Tuning&lt;/h3>
+&lt;p>RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all for good hyperparameter values. Typically, different implementations and different applications will need different hyperparameters. Here are just a few hyperparameters that could make a difference:&lt;/p>
+&lt;ul>
+&lt;li>reward function term coefficients&lt;/li>
+&lt;li>number of policy updates and samples per update&lt;/li>
+&lt;li>learning rate&lt;/li>
+&lt;li>entropy coefficient&lt;/li>
+&lt;li>value coefficient&lt;/li>
+&lt;li>network architecture&lt;/li>
+&lt;li>epochs and minibatch size for policy updates&lt;/li>
+&lt;li>clipping values for gradients, rewards, values, observations, gradients&lt;/li>
+&lt;/ul>
+&lt;p>The good thing is &lt;a href="https://wandb.ai/site" target="_blank" rel="noopener">Weights &amp;amp; Biases&lt;/a> has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
+&lt;a href="https://docs.wandb.ai/guides/sweeps" target="_blank" rel="noopener">Check it out.&lt;/a>&lt;/p>
+&lt;h3 id="gradient-normalization-and-clipping">Gradient Normalization and Clipping&lt;/h3>
+&lt;p>This is another one that could be obvious if you have a background in supervised learning. Normalizing the gradient of the value and policy networks after each backward pass can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other tricks for avoiding these same issues include rewarding normalization and clipping, value function loss clipping, and advantage standardization.&lt;/p>
+&lt;p>Code examples:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/a2c_common.py#L252" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/algo/ppo.py#L82" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_norm_.html" target="_blank" rel="noopener">torch.nn.utils.clip_grad_norm_&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://pytorch.org/docs/stable/generated/torch.nn.utils.clip_grad_value_.html" target="_blank" rel="noopener">torch.nn.utils.clip_grad_value_&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="reward-normalization-and-clipping">Reward Normalization and Clipping&lt;/h3>
+&lt;p>Typically, it is best not to have reward values that differ by many orders of magnitude. For example, in the paper &lt;a href="https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf" target="_blank" rel="noopener">Playing Atari with Deep Reinforcement Learning&lt;/a>, the authors clip all rewards to the range $ \left[-1, 1\right] $.&lt;/p>
+&lt;blockquote>
+&lt;p>Since the scale of scores varies greatly from game to game, we fixed all positive rewards to be 1 and all negative rewards to be −1, leaving 0 rewards unchanged. Clipping the rewards in this manner limits the scale of the error derivatives and makes it easier to use the same learning rate across multiple games. At the same time, it could affect the performance of our agent since it cannot differentiate between rewards of different magnitude.
+&lt;br>
+&amp;ndash; &lt;cite>Mnih, Volodymyr, Koray Kavukcuoglu, David Silver, Alex Graves, Ioannis Antonoglou, Daan Wierstra, and Martin Riedmiller. &amp;ldquo;Playing atari with deep reinforcement learning.&amp;rdquo; arXiv preprint arXiv:1312.5602 (2013).&lt;/cite>&lt;/p>
+&lt;/blockquote>
+&lt;p>In addition to just clipping the rewards, you can also keep a running mean and standard deviations of rewards to standardize rewards or returns (discounted rewards).&lt;/p>
+&lt;p>Code examples:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/model.py" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>
+&lt;ul>
+&lt;li>Rewards are processed by these two environment wrappers from Stable Baselines3&lt;/li>
+&lt;li>&lt;a href="https://stable-baselines3.readthedocs.io/en/master/common/atari_wrappers.html#stable_baselines3.common.atari_wrappers.ClipRewardEnv" target="_blank" rel="noopener">stable_baselines3.common.atari_wrappers.ClipRewardEnv&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://stable-baselines3.readthedocs.io/en/master/guide/vec_envs.html#stable_baselines3.common.vec_env.VecNormalize.normalize_reward" target="_blank" rel="noopener">stable_baselines3.common.vec_env.VecNormalize.normalize_reward&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="advantage-standardization">Advantage Standardization&lt;/h3>
+&lt;p>Before calculating a loss for the policy network, advantages are computed and then standardized, such that about half of the advantages are positive and about half are negative. This is done for stability of training and variance reduction. Here is an excert from &lt;a href="http://rail.eecs.berkeley.edu/deeprlcourse-fa17/f17docs/hw2_final.pdf" target="_blank" rel="noopener">HW2&lt;/a> of the Berkely Deep RL course:&lt;/p>
+&lt;blockquote>
+&lt;p>A trick which is known to usually boost empirical performance by lowering variance of the
+estimator is to center advantages and normalize them to have mean of 0 and a standard
+deviation of 1.
+From a theoretical perspective, this does two things:&lt;/p>
+&lt;ul>
+&lt;li>Makes use of a constant baseline at all timesteps for all trajectories, which does not
+change the policy gradient in expectation.&lt;/li>
+&lt;li>Rescales the learning rate by a factor of 1/σ, where σ is the standard dev of the
+empirical advantages.&lt;/li>
+&lt;/ul>
+&lt;/blockquote>
+&lt;p>Code Examples&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/algo/ppo.py#L36" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/a2c_common.py#L857" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- ### ADAM optimizer -->
+&lt;h3 id="bootstrapping-timeout-terminations">Bootstrapping Timeout Terminations&lt;/h3>
+&lt;p>In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means that the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns (discounted future rewards) are calculated, the truncation makes it seem as if the agent recieved zero reward for the rest of the episode. It is fine to perform updates like this, but learning may be slower, especially if you don&amp;rsquo;t have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can increase the speed of learning.&lt;/p>
+&lt;p>The dictionary definition of bootstrap:&lt;/p>
+&lt;blockquote>
+&lt;p>&lt;strong>Bootstrap (verb)&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>get (oneself or something) into or out of a situation using existing resources. &lt;br>
+&amp;ldquo;the company is bootstrapping itself out of a marred financial past&amp;rdquo; &lt;br>&lt;/li>
+&lt;/ol>
+&lt;p>Source: &lt;a href="https://languages.oup.com/google-dictionary-en/" target="_blank" rel="noopener">OxfordLanguages&lt;/a>&lt;/p>
+&lt;/blockquote>
+&lt;p>In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function (&amp;ldquo;existing resources&amp;rdquo;). Bootstrapping is done with every sample in &lt;a href="https://en.wikipedia.org/wiki/Temporal_difference_learning" target="_blank" rel="noopener">temporal difference learning&lt;/a> (TD-learning) and Q-learning. The TD value update is given below.&lt;/p>
+&lt;p>$$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s&amp;rsquo;) - V(s))$$&lt;/p>
+&lt;p>The target value for the value function is $r + \gamma V(s&amp;rsquo;) $ where $s&amp;rsquo;$ is the state after $s$. $ \alpha $ is the learning rate, and $ \gamma $ is the discount factor.&lt;/p>
+&lt;!-- In policy gradient methods, the objective is to -->
+&lt;p>The RL objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The objective for a state $ s_0 $ is given as:&lt;/p>
+&lt;p>$$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $$&lt;/p>
+&lt;p>$ H $ is the episode length. However, when the episode gets terminated at $ h &amp;lt; H $ due to timeout, we can bootstrap the returns using the value estimate of the final state:&lt;/p>
+&lt;p>$$ J_{\pi}(s_0) = \sum_{t = 0}^{h}\gamma^t r_t + \gamma^{h+1}V(s_{h+1}) $$&lt;/p>
+&lt;p>Bootstrapping can help, but it can also hurt. It reduces variance in the computation of returns at the expense of introducing a bias from the value network. Here are some excerpts from Sutton and Barto&amp;rsquo;s textbook, where they place bootstrapping in the &amp;ldquo;Deadly Triad&amp;rdquo; of instability and divergence.&lt;/p>
+&lt;blockquote>
+&lt;p>&amp;hellip;bootstrapping methods using function approximation may actually diverge to infinity.
+&amp;hellip;Bootstrapping often results in faster learning because it allows learning to take advantage of the state property, the ability to recognize a state upon returning to it. On the other hand, bootstrapping can impair learning on problems where the state representation is poor and causes poor generalization. &lt;br>
+&amp;ndash; &lt;cite> &lt;a href="https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf" target="_blank" rel="noopener">Barto, Sutton. Reinforcement Learning: An Introduction. 2018&lt;/a> &lt;/cite>&lt;/p>
+&lt;/blockquote>
+&lt;!-- I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance. -->
+&lt;!-- This idea is this
+I believe this is more necessary as your number of samples per update decreases. -->
+&lt;p>Controlling this bias-variance tradeoff with bootstrapping is a central idea in &lt;a href="#generalized-advantage-estimation">Generalized Advantage Estimation (GAE)&lt;/a>.&lt;/p>
+&lt;!-- If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation). -->
+&lt;p>Code examples:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L86" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>
+&lt;ul>
+&lt;li>In this computation, the tensor &lt;code>self.bad_masks&lt;/code> indicates when bootstrapping should occur. If its value is 0, then the reward at the terminal timestep is replaced with the value estimate of the terminal state.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474" target="_blank" rel="noopener">RL Games&lt;/a>
+&lt;ul>
+&lt;li>As far as I can tell, RL Games does not do any bootstrapping of timeout terminations (no extra information about terminations is received from environments). I added bootstrapping to the function linked above in my own fork and found that performance actually decreased.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="generalized-advantage-estimation">Generalized Advantage Estimation&lt;/h3>
+&lt;p>Generalized Advantage Estimation (GAE), from the paper from the paper &lt;a href="https://arxiv.org/pdf/1506.02438.pdf" target="_blank" rel="noopener">High-Dimensional Continuous Control Using Generalized Advantage Estimation&lt;/a>, provides a continuous bias-variance tradeoff through controlling the amount of bootstrapping via a parameter $\lambda$. The formula for computing advantages is given below, but I highly recommend reading the actual paper if you are going to program this yourself.&lt;/p>
+$$ \hat{A}^{GAE(\gamma, \lambda)}_t = \sum^\infty_{l=0} (\gamma \lambda)^l \delta^V_{t+l} $$
+$$\delta_{t}^V = r_t + \gamma V(s_{t+1}) -V(s_t)$$
+&lt;p>The TD-learning value update is a special case of GAE when $\lambda = 0$. When $\lambda = 1$, no bootstrapping occurs. Most of the time, I set $\gamma = 0.99$ and $\lambda = 0.95$.&lt;/p>
+&lt;p>Code examples:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;h3 id="entropy-decay">Entropy Decay&lt;/h3>
+&lt;p>The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want more exploration early in training. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during sample collection. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying desired entropy to zero may yield the desired the exploration-explotation behavior.&lt;/p>
+&lt;p>In my own work in legged locomotion, I have often found this uncessary. The majority of the time, I use PPO and set the entropy coefficient to 0.0 for the entirety of training. Perhaps the chaotic underactuated dynamics of a legged robot eliminates the need for extra exploration noise.&lt;/p>
+&lt;!-- you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
+&lt;p>Code example for PPO:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/schedulers.py#L54" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- One of the primary ways to control entropy is through an entropy term in the policy loss function. If your policy outputs to a Gaussian distribution over actions, the entropy loss acts on the variance of that distribution. -->
+&lt;!--
+You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
+&lt;h3 id="value-network-loss-clipping">Value Network Loss Clipping&lt;/h3>
+&lt;p>This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce very large errors can occur. The MSE loss can be clipped from [-k, k] where k is usually around 0.2.&lt;/p>
+&lt;p>Code Examples:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/common_losses.py#L7" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/algo/ppo.py#L68" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;!-- ### PPO loss -->
+&lt;!-- ### shared actor-critic layers -->
+&lt;h3 id="learning-rate-scheduling">Learning Rate Scheduling&lt;/h3>
+&lt;p>A linearly decreasing learning rate is a common technique for training neural networks. The idea is that in the beginning of training, the optimizer should take large steps to minimize loss rapidly, while near the end, the steps should be smaller to facilitate convergence to a local optima.&lt;/p>
+&lt;p>A fancier way to control the learning rate is to adaptively set it based on a desired KL-divergence between policy iterations. In most of my work, I use the RL Games library implementation of an adaptive learning rate with an initial learning rate of 1e-5. Here is what the learning rate and KL-divergence plots usually looks like:
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img alt="pic" srcset="
+/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp 400w,
+/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_b7bf57980ec21268496775759909e319.webp 760w,
+/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
+src="https://jmcoholich.github.io/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp"
+width="760"
+height="263"
+loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;em>KL-divergence and learning rate plotted for five training runs from my &lt;a href="https://www.jeremiahcoholich.com/publication/quadruped_footsteps/" target="_blank" rel="noopener">quadruped project&lt;/a>. The desired KL-divergence was set to 0.01. The learning rate hovers around 7e-4.&lt;/em>&lt;/p>
+&lt;p>Code examples for linear learning rate decay:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/utils.py#L46" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.StepLR.html" target="_blank" rel="noopener">torch.optim.lr_scheduler.StepLR&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Code for adaptive learning rate:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/50d9a460f8ba41de5dbac4abed04f8de9b849f4f/rl_games/common/schedulers.py#L19" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;p>Thanks for reading!&lt;/p></description></item><item><title>I Completed the Google Foobar Challenge</title><link>https://jmcoholich.github.io/post/google_foobar/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/google_foobar/</guid><description>&lt;!-- ## Here's what the challenge is -->
 &lt;p>The Google Foobar challenge is a programming challenge used by Google for recruiting. You must be invited to participate (&lt;a href="https://bootcamp.uxdesign.cc/google-foobar-googles-secret-hiring-process-bc92f011c6ad" target="_blank" rel="noopener">article&lt;/a> with more info). The challenge contains five levels of increasing difficulty, which require knowlege in the following areas:&lt;/p>
 &lt;ul>
 &lt;li>dynamic programming&lt;/li>

@@ -128,11 +128,11 @@ Contents:
 - [Reward Normalization and Clipping](#reward-normalization-and-clipping)
 - [Advantage Standardization](#advantage-standardization)
 - [Hyperparameter Tuning](#hyperparameter-tuning)
-- [Value Network Loss Clipping](#value-network-loss-clipping)
-- [Learning Rate Scheduling](#learning-rate-scheduling)
 - [Bootstrapping Timeout Terminations](#bootstrapping-timeout-terminations)
 - [Generalized Advantage Estimation](#generalized-advantage-estimation)
 - [Entropy Decay](#entropy-decay)
+- [Value Network Loss Clipping](#value-network-loss-clipping)
+- [Learning Rate Scheduling](#learning-rate-scheduling)
 
 Thanks to Elon Musk for helping me proofread and edit this post.
 
@@ -236,9 +236,10 @@ Code Examples
 RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all for good hyperparameter values. Typically, different implementations and different applications will need different hyperparameters. Here are just a few hyperparameters that could make a difference:
 
 - reward function term coefficients
-- number of policy updates / samples per update
+- number of policy updates and samples per update
 - learning rate
 - entropy coefficient
+- value coefficient
 - network architecture
 - epochs and minibatch size for policy updates
 - clipping values for gradients, rewards, values, observations, gradients
@@ -246,36 +247,6 @@ RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all
 
 The good thing is [Weights & Biases](https://wandb.ai/site) has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
 [Check it out.](https://docs.wandb.ai/guides/sweeps)
-
-
-### Value Network Loss Clipping
-This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error loss where the target values are value estimates from policy rollouts. Due to the unpredictable nature of collecting these rollouts, especially when few samples are collected, the target values could contain unexpected values. Due to this, the MSE loss is sometimes clipped from [-k, k] where k is usually around 0.2.
-
-
-Code Examples:
-- https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/common_losses.py#L7
-- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/algo/ppo.py#L68
-
-
-<!-- ### PPO loss -->
-<!-- ### shared actor-critic layers -->
-
-
-### Learning Rate Scheduling
-A commong thing is to implement a linearly decreasing learning rate throughout training. The idea is that towards the end of training, you want to avoid making descrutively large policy updates (this is also the idea behind TRPO and allocating your retirement savings into bonds as you grow older.) and your performance will have mostly saturated so you should just be fine-tuning your policy.
-
-A fancier way to do this is to adaptively set the learning rate based on a desired [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between something. I have mostly used this for my work with the quadruped, set the initial learning rate to 1e-5 and then let the adaptive lr take over. Here is what the lr plot usually looks like.
-![pic](adaptive_lr.png)
-
-This shows five training runs for my [quadruped project](https://www.jeremiahcoholich.com/publication/quadruped_footsteps/). The desired KL-divergence was set to 0.01. The lr usually hovers around 7e-4.
-
-Code examples for linear lr decay:
-- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/utils.py#L46
-- https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.StepLR.html
-
-Code for adaptive lr:
-- https://github.com/Denys88/rl_games/blob/50d9a460f8ba41de5dbac4abed04f8de9b849f4f/rl_games/common/schedulers.py#L19
-
 
 
 <!-- ### ADAM optimizer -->
@@ -362,6 +333,33 @@ Code example for PPO:
 
  You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
 
+### Value Network Loss Clipping
+This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce very large errors can occur. The MSE loss can be clipped from [-k, k] where k is usually around 0.2.
+
+
+Code Examples:
+- https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/common_losses.py#L7
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/algo/ppo.py#L68
+
+
+<!-- ### PPO loss -->
+<!-- ### shared actor-critic layers -->
+
+
+### Learning Rate Scheduling
+A common thing is to implement a linearly decreasing learning rate throughout training. The idea is that towards the end of training, you want to avoid making descrutively large policy updates (this is also the idea behind TRPO and allocating your retirement savings into bonds as you grow older.) and your performance will have mostly saturated so you should just be fine-tuning your policy.
+
+A fancier way to do this is to adaptively set the learning rate based on a desired [KL-divergence](https://en.wikipedia.org/wiki/Kullback%E2%80%93Leibler_divergence) between something. I have mostly used this for my work with the quadruped, set the initial learning rate to 1e-5 and then let the adaptive lr take over. Here is what the lr plot usually looks like.
+![pic](adaptive_lr.png)
+
+This shows five training runs for my [quadruped project](https://www.jeremiahcoholich.com/publication/quadruped_footsteps/). The desired KL-divergence was set to 0.01. The lr usually hovers around 7e-4.
+
+Code examples for linear lr decay:
+- https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/utils.py#L46
+- https://pytorch.org/docs/stable/generated/torch.optim.lr_scheduler.StepLR.html
+
+Code for adaptive lr:
+- https://github.com/Denys88/rl_games/blob/50d9a460f8ba41de5dbac4abed04f8de9b849f4f/rl_games/common/schedulers.py#L19
 
 
 Thanks for reading!

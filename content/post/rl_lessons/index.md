@@ -202,7 +202,7 @@ RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all
 - value coefficient
 - network architecture
 - epochs and minibatch size for policy updates
-- clipping values for gradients, rewards, values, observations, gradients
+- clipping values for gradients, rewards, values, observations, PPO loss
 
 
 The good thing is [Weights & Biases](https://wandb.ai/site) has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
@@ -373,14 +373,17 @@ Code example for PPO:
  You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
 
 ### Value Network Loss Clipping
-This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce very large errors can occur. The MSE loss can be clipped from [-k, k] where k is usually around 0.2.  # TODO this is not 100% correct is it? I'm clipping something else to 0.2.
+This is another trick aimed at controlling the behavior of the gradients and preventing excessively large updates. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce large errors can occur.
 
+Value network loss clipping constrains the change in value estimates to a "trust region" defined by the old value estimates $\pm\ \epsilon$. (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.) Once the new value estimates are at the edge of the trust region, no gradient will be calculated for target values outside of the trust region. $\epsilon$ is usually around $0.2$.
+
+<!-- The MSE loss can be clipped from [-k, k] where k is usually around 0.2. -->
+
+Strangely, I couldn't find much mention of this type of value clipping in the academic literature or on the internet, and I don't know if this technique has a proper name. I only found [this paper](https://research.google/pubs/pub50213/) ("PPO-style pessimistic clipping") and this [GitHub issue](https://github.com/openai/baselines/issues/91). I don't think "pessimistic clipping" is an appropriate name, since "pessimism" in the context of value functions in RL usually means values are underestimated.
 
 Code Examples:
 - [RL Games](https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/common_losses.py#L7)
 - [pytorch-a2c-ppo-acktr-gail](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/41332b78dfb50321c29bade65f9d244387f68a60/a2c_ppo_acktr/algo/ppo.py#L68)
-
-
 <!-- ### PPO loss -->
 <!-- ### shared actor-critic layers -->
 

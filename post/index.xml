@@ -13,7 +13,7 @@ First of all, it is difficult to reproduce results in deep reinforcement learnin
 &lt;!-- Some of these "tricks" are will be obvious if you have experience in supervised learning, such as gradient clipping and input normalization. -->
 &lt;!-- These are all things that are very important to getting this working, but are mundane enough that most of the time no one really tells you explicitly to make sure to do these things or they assume that you already know. -->
 &lt;!-- Where possible, I have tried to include links to code in RL implementations where these tricks are found. I will additionally include a link to any help Pytorch functions for implementation. -->
-&lt;p>In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. Knowledge of some of these tricks is only necessary if you are implementing an RL algorithm from scratch, as most public implementations will already include them. However, knowing of their existence will enable you to debug more effectively and make changes more intelligently. They are roughly ordered in descending order of importance.&lt;/p>
+&lt;p>In hindsight, there was no single major flaw with my initial PPO implementation, but rather many small tricks and optimizations that were missing. The purpose of this post is to enumerate these tricks and provide references to code where they are implemented. They are roughly ordered in descending order of importance. Knowledge of some of these tricks is only necessary if you are implementing an RL algorithm from scratch, as most public implementations will already include them. However, knowing of their existence will enable you to debug more effectively and make changes more intelligently.&lt;/p>
 &lt;p>Different RL implementations will include a slightly different set of tricks. As evidence of their importance, check out this figure (below) from the paper &lt;a href="https://arxiv.org/pdf/1709.06560.pdf" target="_blank" rel="noopener">Deep Reinforcement Learning that Matters&lt;/a>. The authors show empirically that different popular implementions of the same RL algorithm differ significantly in performance on standard RL benchmarks, even when controlling for hyperparameters and network architecture.&lt;/p>
 &lt;!-- (They also expose a similar sensitivity to hyperparameters, network architecture, random seed, reward scale, and choice of environment -- RL is very finicky). -->
 &lt;!-- Different implementations include different sets of tricks -- and they really do make a difference. In -->
@@ -30,8 +30,8 @@ First of all, it is difficult to reproduce results in deep reinforcement learnin
 &lt;!-- However, while it is trivial to clone a popular RL repository and train policies on existing benchmarks, implementing RL algorithms from scratch or succesfully applying RL to a new task or application domain is quite difficult. Reading academic papers and understand the theory behind why an algorithm works is an important part of research, but not enough for .
 My issue was that even if I understood all the theory behind an RL algorithm, either from a paper or from Spinning Up, there were still many tricks required to get RL working in practice. To draw a parallel to supervised learning, it would be like understanding SGD and neural networks, but not having knowledge of batch norms or residual connections.
 Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO paper (below) will not yeild SOTA performance. You need all the other stuff. -->
-&lt;p>Now for some disclaimers: Nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that are missing. Also, RL is a super-hot field and perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don&amp;rsquo;t hesitate to reach out to me if you think there is something important missing!&lt;/p>
-&lt;p>Most of the examples will come from either of these two RL implementations which I am familair with:&lt;/p>
+&lt;p>Now for some disclaimers &amp;ndash; nearly all of my experience comes from training on-policy algorithms for continuous control, so there may be useful tips for discrete/off-policy settings that I&amp;rsquo;m missing. Also, RL is a super-hot field and perhaps some of the content in this post is already outdated. Hopefully, this blog is at least useful to someone starting out like I was. Please don&amp;rsquo;t hesitate to reach out to me if you think there is something important missing!&lt;/p>
+&lt;p>Most of the examples will come from either of these two RL implementations:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail" target="_blank" rel="noopener">pytorch-a2c-ppo-acktr-gail&lt;/a>&lt;/li>
 &lt;li>&lt;a href="https://github.com/Denys88/rl_games" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
@@ -55,13 +55,13 @@ Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO p
 &lt;li>&lt;a href="#gradient-normalization-and-clipping">Gradient Normalization and Clipping&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#reward-normalization-and-clipping">Reward Normalization and Clipping&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#advantage-standardization">Advantage Standardization&lt;/a>&lt;/li>
-&lt;li>&lt;a href="#bootstrapping-timeout-terminations">Bootstrapping Incomplete Episodes&lt;/a>&lt;/li>
+&lt;li>&lt;a href="#bootstrapping-incomplete-episodes">Bootstrapping Incomplete Episodes&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#generalized-advantage-estimation">Generalized Advantage Estimation&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#entropy-decay">Entropy Decay&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#value-network-loss-clipping">Value Network Loss Clipping&lt;/a>&lt;/li>
 &lt;li>&lt;a href="#learning-rate-scheduling">Learning Rate Scheduling&lt;/a>&lt;/li>
 &lt;/ul>
-&lt;p>Thanks to &lt;a href="https://www.andrewszot.com/" target="_blank" rel="noopener">Andrew Szot&lt;/a> and &lt;a href="">Mathew Piotrowicz&lt;/a>for reading drafts of this and providing valuable feedback.&lt;/p>
+&lt;p>Thanks to &lt;a href="https://www.andrewszot.com/" target="_blank" rel="noopener">Andrew Szot&lt;/a> and &lt;a href="https://www.linkedin.com/in/mathew-piotrowicz-aa4962137/" target="_blank" rel="noopener">Mathew Piotrowicz&lt;/a> for reading drafts of this and providing feedback.&lt;/p>
 &lt;h3 id="observation-normalization-and-clipping">Observation Normalization and Clipping&lt;/h3>
 &lt;p>In RL, the inputs to the policy and value networks are observations, which can consist of values that differ by orders of magnitude. For example, if you are learning a policy to control a robot, your observation could contain joint angles ranging from $ -\frac{\pi}{2} $ to $ \frac{\pi}{2} $ radians and a robot position coordinate that lies between 0 and 1000 meters. Normalizing the input space to eliminate this difference in scale leads to more stable training and faster convergence. This should be nothing new to those with prior experience training neural networks.&lt;/p>
 &lt;p>The two most common methods for preprocessing are standardization and rescaling. Standardization refers to subtracting the mean and dividing by the standard deviation of the data so that each dimension approximates a standard normal distribution. Rescaling means mapping the data to the range $ \left[0, 1\right] $ by subtacting the min and dividing by the range. In either case, clipping should also be applied after normalization. Neural networks are bad at extrapolation, and outliers can produce unexpected outputs. In my work, observations are clipped to $[-5.0, 5.0]$ after standardization.&lt;/p>
@@ -104,13 +104,13 @@ PMTG, foot position instead of joints to avoid learning IK, make the outputs jus
 &lt;/p>
 &lt;p>For example, in the paper &lt;a href="https://arxiv.org/abs/2005.04323" target="_blank" rel="noopener">ALLSTEPS: Curriculum-driven Learning of Stepping Stone Skills&lt;/a>, the authors train a bipedal robot to hit a series of stepping stones. A naive reward design would give +1.0 if the robot&amp;rsquo;s foot hit the center of the foot target (depicted above), and 0.0 otherwise. Instead of doing this, the authors specify a reward function of&lt;/p>
 &lt;p>$$ r_{target} = k_{target}\exp(-d/k_d) $$&lt;/p>
-&lt;p>where $d$ is the distance from the foot to the target, and $ k_{target}$ and $k_d$ are hyperparameters. The authors explain:&lt;/p>
+&lt;p>where $d$ is the distance from the foot to the target, and $ k_{target}$ and $k_d$ are hyperparameters. If the robot&amp;rsquo;s foot makes any contact with the stepping stone, it receives a reward. The closer the foot is to the center of the block, the higher the reward. The authors explain:&lt;/p>
 &lt;blockquote>
 &lt;p>In the initial stages of training, when the character makes contact with the target, the contact location may be far away from the center. Consequently, the gradient with respect to the target reward is large due to the exponential, which encourages the policy to move the foot closer to the center in the subsequent training iterations.&lt;/p>
 &lt;/blockquote>
-&lt;p>Without the dense reward, there would be no reward gradient across the state space, which slows the rate of learning.&lt;/p>
+&lt;p>Without the dense reward, there would be no reward gradient across the state space, which makes learning more difficult.&lt;/p>
 &lt;h3 id="hyperparameter-tuning">Hyperparameter Tuning&lt;/h3>
-&lt;p>RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all for good hyperparameter values. Typically, different implementations and different applications will need different hyperparameters. Here are just a few hyperparameters that could make a difference:&lt;/p>
+&lt;p>RL is notoriously sensitive to hyperparameters and there is no one-size-fits-all for good hyperparameter values. Typically, different implementations and different applications will require different hyperparameters. Here are just a few hyperparameters that could make a difference:&lt;/p>
 &lt;ul>
 &lt;li>reward function term coefficients&lt;/li>
 &lt;li>number of policy updates and samples per update&lt;/li>
@@ -118,13 +118,12 @@ PMTG, foot position instead of joints to avoid learning IK, make the outputs jus
 &lt;li>entropy coefficient&lt;/li>
 &lt;li>value coefficient&lt;/li>
 &lt;li>network architecture&lt;/li>
-&lt;li>epochs and minibatch size for policy updates&lt;/li>
-&lt;li>clipping values for gradients, rewards, values, observations, PPO loss&lt;/li>
+&lt;li>batch size and number of epochs per policy update&lt;/li>
+&lt;li>clipping values for gradients, rewards, values, observations, and the PPO loss&lt;/li>
 &lt;/ul>
-&lt;p>The good thing is &lt;a href="https://wandb.ai/site" target="_blank" rel="noopener">Weights &amp;amp; Biases&lt;/a> has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.
-&lt;a href="https://docs.wandb.ai/guides/sweeps" target="_blank" rel="noopener">Check it out.&lt;/a>&lt;/p>
+&lt;p>The good thing is &lt;a href="https://docs.wandb.ai/guides/sweeps" target="_blank" rel="noopener">Weights &amp;amp; Biases&lt;/a> has a powerful pipeline for automated, distributed hyperparameter sweeps. They support random search, grid search, and Bayesian search.&lt;/p>
 &lt;h3 id="gradient-normalization-and-clipping">Gradient Normalization and Clipping&lt;/h3>
-&lt;p>This is another one that could be obvious if you have a background in supervised learning. Normalizing the gradient of the value and policy networks after each backward pass can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other tricks for avoiding these same issues include rewarding normalization and clipping, value function loss clipping, and advantage standardization.&lt;/p>
+&lt;p>This is another one that could be obvious if you have a background in deep learning already. Normalizing the gradient of the value and policy networks after each backward pass can help avoid numerical overflow, exploding gradients, or destructively large parameter updates. Other tricks for avoiding these same issues include reward normalization and clipping, value function loss clipping, and advantage standardization.&lt;/p>
 &lt;p>Code examples:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/a2c_common.py#L252" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
@@ -151,7 +150,7 @@ PMTG, foot position instead of joints to avoid learning IK, make the outputs jus
 &lt;/li>
 &lt;/ul>
 &lt;h3 id="advantage-standardization">Advantage Standardization&lt;/h3>
-&lt;p>Before calculating a loss for the policy network, advantages are computed and then standardized, such that about half of the advantages are positive and about half are negative. This is done for stability of training and variance reduction. Here is an excert from &lt;a href="http://rail.eecs.berkeley.edu/deeprlcourse-fa17/f17docs/hw2_final.pdf" target="_blank" rel="noopener">HW2&lt;/a> of the Berkely Deep RL course:&lt;/p>
+&lt;p>Before calculating a loss for the policy network, advantages are computed and then standardized, such that about half of the advantages are positive and about half are negative. This is done for stability of training and variance reduction. Here is an excerpt from &lt;a href="http://rail.eecs.berkeley.edu/deeprlcourse-fa17/f17docs/hw2_final.pdf" target="_blank" rel="noopener">HW2&lt;/a> of the Berkely Deep RL course:&lt;/p>
 &lt;blockquote>
 &lt;p>A trick which is known to usually boost empirical performance by lowering variance of the
 estimator is to center advantages and normalize them to have mean of 0 and a standard
@@ -171,8 +170,8 @@ empirical advantages.&lt;/li>
 &lt;/ul>
 &lt;!-- ### ADAM optimizer -->
 &lt;h3 id="bootstrapping-incomplete-episodes">Bootstrapping Incomplete Episodes&lt;/h3>
-&lt;p>TODO: always bootstrap INCOMPLETE episodes or timeouts on continuous tasks. Timeout can be a completed episode. Does RL Games really not do this? Make sure I have my formulas right (do I need to include expectations?)&lt;/p>
-&lt;p>In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. This means the sample collection will often end before the episode terminates, meaning the policy will be updated with samples from incomplete episodes. When returns (sum of discounted future rewards) are calculated, this truncation makes it seem as if the agent received zero reward for the rest of the episode. To correct this error, the return computation can be &amp;ldquo;bootstrapped&amp;rdquo; with the value estimate of the final state.&lt;/p>
+&lt;!-- TODO: always bootstrap INCOMPLETE episodes or timeouts on continuous tasks. Timeout can be a completed episode. Does RL Games really not do this? Make sure I have my formulas right (do I need to include expectations?) -->
+&lt;p>In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. This means the sample collection will often end before the episode does, meaning the policy will be updated with samples from incomplete episodes. When returns (sum of discounted future rewards) are calculated, this truncation makes it seem as if the agent received zero reward for the rest of the episode. To correct this error, the return computation can be &amp;ldquo;bootstrapped&amp;rdquo; with the value estimate of the final state.&lt;/p>
 &lt;!-- It is fine to perform updates like this, but learning may be slower, especially if you don't have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can increase the speed of learning. -->
 &lt;p>The dictionary definition of bootstrap:&lt;/p>
 &lt;blockquote>
@@ -213,10 +212,10 @@ I believe this is more necessary as your number of samples per update decreases.
 &lt;li>In this computation, the tensor &lt;code>self.bad_masks&lt;/code> indicates when bootstrapping should occur. If its value is 0, then the reward at the terminal timestep is replaced with the value estimate of the terminal state.&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
 &lt;/ul>
+&lt;!-- - [RL Games](https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474) -->
 &lt;h3 id="generalized-advantage-estimation">Generalized Advantage Estimation&lt;/h3>
-&lt;p>TODO: add stuff for bootstrapping and terminal states.&lt;/p>
+&lt;!-- TODO: add stuff for bootstrapping and terminal states. -->
 &lt;p>Generalized Advantage Estimation (GAE), from the paper from the paper &lt;a href="https://arxiv.org/pdf/1506.02438.pdf" target="_blank" rel="noopener">High-Dimensional Continuous Control Using Generalized Advantage Estimation&lt;/a>, provides a continuous bias-variance tradeoff through controlling the amount of bootstrapping via a parameter $\lambda$. The formula for computing advantages is given below, but I highly recommend reading the actual paper if you are going to program this yourself.&lt;/p>
 $$ \hat{A}^{GAE(\gamma, \lambda)}_t = \sum^\infty_{l=0} (\gamma \lambda)^l \delta^V_{t+l} $$
 $$\delta_{t}^V = r_t + \gamma V(s_{t+1}) -V(s_t)$$
@@ -242,10 +241,10 @@ $$\hat{V}^{GAE(\gamma, \lambda)}_t= \hat{A}^{GAE(\gamma, \lambda)}_t + V(s_o)$$&
 &lt;/li>
 &lt;/ul>
 &lt;h3 id="entropy-decay">Entropy Decay&lt;/h3>
-&lt;p>The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want more exploration early in training. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during sample collection. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying desired entropy to zero may yield the desired exploration-explotation behavior.&lt;/p>
-&lt;p>In my own work in legged locomotion, I have often found this uncessary. The majority of the time, I use PPO and set the entropy coefficient to 0.0 for the entirety of training. Perhaps the chaotic underactuated dynamics of a legged robot eliminates the need for extra exploration noise.&lt;/p>
+&lt;p>The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want more exploration early in training. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during sample collection. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying the desired entropy to zero may yield the desired exploration-exploitation behavior.&lt;/p>
+&lt;p>In my own work in legged locomotion, I have often found this uncessary. The majority of the time, I use PPO and set the entropy coefficient to 0.0 for the entirety of training. Perhaps the chaotic underactuated dynamics of the legged robot eliminates the need for extra exploration noise.&lt;/p>
 &lt;!-- you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
-&lt;p>Code example for PPO:&lt;/p>
+&lt;p>Code example:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/7b5f9500ee65ae0832a7d8613b019c333ecd932c/rl_games/common/schedulers.py#L54" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
 &lt;/ul>
@@ -254,9 +253,11 @@ $$\hat{V}^{GAE(\gamma, \lambda)}_t= \hat{A}^{GAE(\gamma, \lambda)}_t + V(s_o)$$&
 You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
 &lt;h3 id="value-network-loss-clipping">Value Network Loss Clipping&lt;/h3>
 &lt;p>This is another trick aimed at controlling the behavior of the gradients and preventing excessively large updates. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce large errors can occur.&lt;/p>
-&lt;p>Value network loss clipping constrains the change in value estimates to a &amp;ldquo;trust region&amp;rdquo; defined by the old value estimates $\pm\ \epsilon$. (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.) Once the new value estimates are at the edge of the trust region, no gradient will be calculated for target values outside of the trust region. $\epsilon$ is usually around $0.2$.&lt;/p>
+&lt;p>Value network loss clipping constrains the change in value estimates between policy iterations to a &amp;ldquo;trust region&amp;rdquo; of $\pm\ \epsilon$ from the old value estimates (equation below). (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.)&lt;/p>
+&lt;p>$$V_t(s_0) \in \left[V_{t-1}(s_0) - \epsilon, V_{t-1}(s_0) + \epsilon\right]$$&lt;/p>
+&lt;p>Once the new value estimates are at the edge of the trust region, no gradient will be calculated for target values outside of the trust region. $\epsilon$ is usually set to something like $0.2$.&lt;/p>
 &lt;!-- The MSE loss can be clipped from [-k, k] where k is usually around 0.2. -->
-&lt;p>Strangely, I couldn&amp;rsquo;t find much mention of this type of value clipping in the academic literature or on the internet, and I don&amp;rsquo;t know if this technique has a proper name. I only found &lt;a href="https://research.google/pubs/pub50213/" target="_blank" rel="noopener">this paper&lt;/a> (&amp;ldquo;PPO-style pessimistic clipping&amp;rdquo;) and this &lt;a href="https://github.com/openai/baselines/issues/91" target="_blank" rel="noopener">GitHub issue&lt;/a>. I don&amp;rsquo;t think &amp;ldquo;pessimistic clipping&amp;rdquo; is an appropriate name, since &amp;ldquo;pessimism&amp;rdquo; in the context of value functions in RL usually means values are underestimated.&lt;/p>
+&lt;p>Strangely, I couldn&amp;rsquo;t find much mention of value network loss clipping in the academic literature or on the internet, and I don&amp;rsquo;t know if this technique goes by another name. I only found &lt;a href="https://research.google/pubs/pub50213/" target="_blank" rel="noopener">this paper&lt;/a> (&amp;ldquo;PPO-style pessimistic clipping&amp;rdquo;) and this &lt;a href="https://github.com/openai/baselines/issues/91" target="_blank" rel="noopener">GitHub issue&lt;/a>. I don&amp;rsquo;t think &amp;ldquo;pessimistic clipping&amp;rdquo; is an appropriate name, since &amp;ldquo;pessimism&amp;rdquo; in the context of value functions in RL usually means values are underestimated.&lt;/p>
 &lt;p>Code Examples:&lt;/p>
 &lt;ul>
 &lt;li>&lt;a href="https://github.com/Denys88/rl_games/blob/8da6852f72bdbe867bf12f792b00df944b419c43/rl_games/common/common_losses.py#L7" target="_blank" rel="noopener">RL Games&lt;/a>&lt;/li>
@@ -266,7 +267,7 @@ You can just decrease this entropy coefficient. In off policy algorithms like DD
 &lt;!-- ### shared actor-critic layers -->
 &lt;h3 id="learning-rate-scheduling">Learning Rate Scheduling&lt;/h3>
 &lt;p>A linearly decreasing learning rate is a common technique for training neural networks. The idea is that in the beginning of training, the optimizer should take large steps to minimize loss rapidly, while near the end, the steps should be smaller to facilitate convergence to a local optima.&lt;/p>
-&lt;p>A fancier way to control the learning rate is to adaptively set it based on a desired KL-divergence between policy iterations. In most of my work, I use the RL Games library implementation of an adaptive learning rate with an initial learning rate of 1e-5. Here is what the learning rate and KL-divergence plots usually looks like:
+&lt;p>A fancier way to control the learning rate is to adaptively set it based on a desired KL-divergence between policy iterations. In most of my work, I use the RL Games implementation of an adaptive learning rate with an initial learning rate of 1e-5. Here is what the learning rate and KL-divergence plots usually looks like:
 &lt;figure >
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img alt="pic" srcset="

@@ -54,6 +54,8 @@ First of all, it is difficult to reproduce results in deep reinforcement learnin
 
 <!-- Reinforcement Learning is a category in machine learning that doesn't quite fall under the scope of supervised or unsupervised learning -->
 
+*Update 9/15/2022: Experimental results coming soon!*
+
 When I first started studying reinforcement learning (RL), I implemented [Proximal Policy Optimization (PPO)](https://arxiv.org/abs/1707.06347) from scratch using only the [psuedocode](https://spinningup.openai.com/en/latest/algorithms/ppo.html#pseudocode) on OpenAI's website. It didn't work and failed to obtain nearly any reward on most OpenAI Gym environments. It took a few more months of debugging, reading other RL implementations, and talking to colleagues to get things working. My conversations with other Georgia Tech students revealed that initially struggling to do basic things with RL was not uncommon. [These](https://www.alexirpan.com/2018/02/14/rl-hard.html#:~:text=Often%2C%20it%20doesn't%2C,out%20of%20the%20RL%20algorithm.) blog [posts](https://andyljones.com/posts/rl-debugging.html) do a great job of explaining the difficulty with RL and really resonate with my own experiences.
 
 
@@ -128,13 +130,13 @@ Contents:
 - [Gradient Normalization and Clipping](#gradient-normalization-and-clipping)
 - [Reward Normalization and Clipping](#reward-normalization-and-clipping)
 - [Advantage Standardization](#advantage-standardization)
-- [Bootstrapping Timeout Terminations](#bootstrapping-timeout-terminations)
+- [Bootstrapping Incomplete Episodes](#bootstrapping-timeout-terminations)
 - [Generalized Advantage Estimation](#generalized-advantage-estimation)
 - [Entropy Decay](#entropy-decay)
 - [Value Network Loss Clipping](#value-network-loss-clipping)
 - [Learning Rate Scheduling](#learning-rate-scheduling)
 
-Thanks to Elon Musk for helping me proofread and edit this post.
+Thanks to [Andrew Szot](https://www.andrewszot.com/) and [Mathew Piotrowicz]()for reading drafts of this and providing valuable feedback.
 
 ### Observation Normalization and Clipping
 
@@ -253,8 +255,13 @@ Code Examples
 
 <!-- ### ADAM optimizer -->
 
-### Bootstrapping Timeout Terminations
-In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. More often than not, this means that the policy will be updated with samples from incomplete episodes that were truncated due to timeout. When returns (discounted future rewards) are calculated, the truncation makes it seem as if the agent recieved zero reward for the rest of the episode. It is fine to perform updates like this, but learning may be slower, especially if you don't have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can increase the speed of learning.
+### Bootstrapping Incomplete Episodes
+
+TODO: always bootstrap INCOMPLETE episodes or timeouts on continuous tasks. Timeout can be a completed episode. Does RL Games really not do this? Make sure I have my formulas right (do I need to include expectations?)
+
+In most RL pipelines, the environment runs for a pre-specified number of steps before a policy update occurs. This means the sample collection will often end before the episode terminates, meaning the policy will be updated with samples from incomplete episodes. When returns (sum of discounted future rewards) are calculated, this truncation makes it seem as if the agent received zero reward for the rest of the episode. To correct this error, the return computation can be "bootstrapped" with the value estimate of the final state.
+
+<!-- It is fine to perform updates like this, but learning may be slower, especially if you don't have very many samples per policy update. Bootstrapping terminal states corresponding to timeouts can increase the speed of learning. -->
 
 The dictionary definition of bootstrap:
 
@@ -264,29 +271,34 @@ The dictionary definition of bootstrap:
 >
 >Source: [OxfordLanguages](https://languages.oup.com/google-dictionary-en/)
 
-In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is done with every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. The TD value update is given below.
+In the context of RL, bootstrapping means estimating value function or Q-function targets using estimates from the same value or Q-function ("existing resources"). Bootstrapping is done with every sample in [temporal difference learning](https://en.wikipedia.org/wiki/Temporal_difference_learning) (TD-learning) and Q-learning. In TD learning, the value estimates are :
 
+$$\hat{V}(s_0) = r_0 + \gamma V(s_{1})$$
+<!-- Which leads to the following value update.
 $$V(s) \leftarrow V(s) + \alpha (r + \gamma V(s') - V(s))$$
 
-The target value for the value function is $r + \gamma V(s') $ where $s'$ is the state after $s$. $ \alpha $ is the learning rate, and $ \gamma $ is the discount factor.
+
+The target value for the value function is $r + \gamma V(s') $ where $s'$ is the state after $s$. $ \alpha $ is the learning rate, and $ \gamma $ is the discount factor. -->
 
 <!-- In policy gradient methods, the objective is to -->
-The RL objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. The objective for a state $ s_0 $ is given as:
+<!-- The RL objective is to maximize the expected discounted sum of future rewards, which is approximated through samples. --> At the other end of the spectrum, values can be estimated for a state $s_0$ without bootstrapping using complete trajectories that start at $s_0$. The value estimate for a state $ s_0 $ from a single rollout from $s_0$ to $s_H$ is:
 
-$$ J_{\pi}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $$
+$$ \hat{V}(s_0) = \sum_{t = 0}^{H}\gamma^t r_t $$
 
-$ H $ is the episode length. However, when the episode gets terminated at $ h < H $ due to timeout, we can bootstrap the returns using the value estimate of the final state:
+When the episode gets truncated at $ h < H $, we can bootstrap this calculation using the value estimate of the final state. Note how $r_h$ is discarded and replaced with $V(s_h)$.
 
-$$ J_{\pi}(s_0) = \sum_{t = 0}^{h}\gamma^t r_t + \gamma^{h+1}V(s_{h+1}) $$
+$$ \hat{V}(s_0) = \sum_{t = 0}^{h - 1}\gamma^t r_t + \gamma^{h}V(s_{h}) $$
 
 Bootstrapping can help, but it can also hurt. It reduces variance in the computation of returns at the expense of introducing a bias from the value network. Here are some excerpts from Sutton and Barto's textbook, where they place bootstrapping in the "Deadly Triad" of instability and divergence.
 > ...bootstrapping methods using function approximation may actually diverge to infinity.
 > ...Bootstrapping often results in faster learning because it allows learning to take advantage of the state property, the ability to recognize a state upon returning to it. On the other hand, bootstrapping can impair learning on problems where the state representation is poor and causes poor generalization. <br>
 -- <cite> [Barto, Sutton. Reinforcement Learning: An Introduction. 2018](https://www.andrew.cmu.edu/course/10-703/textbook/BartoSutton.pdf) </cite>
 
+Controlling this bias-variance tradeoff with bootstrapping is a central idea in [Generalized Advantage Estimation (GAE)](#generalized-advantage-estimation).
 
 
 <!-- I have found that this is not stricly necessary (afaik, the rl_games library does without it) and can sometimes hurt (excess bootstrapping can sometimes hurt, which is a hypothesized reason that DQN and td-learning doesn't do that well). The returns will be the same in expectation, but suffer from higher variance. -->
+
 
 
 
@@ -294,7 +306,8 @@ Bootstrapping can help, but it can also hurt. It reduces variance in the computa
 
 I believe this is more necessary as your number of samples per update decreases. -->
 
-Controlling this bias-variance tradeoff with bootstrapping is a central idea in [Generalized Advantage Estimation (GAE)](#generalized-advantage-estimation).
+This kind of bootstrapping should also be applied to timeout terminations on continouous tasks. Continuous tasks are those where episodes do not end once a particular objective is achieved. One example of this is robot locomotion, where success could be foward walking that continues indefinitely. However, in order to increase sample diversity, episodes are typically subject to a timeout. Since the timeout is independent of the robot's performance, the returns should be bootstrapped.
+<!-- An example of a discrete task would be robotic object rearragement, where once the objects are in the goal configuration, the episode ends. Timeouts are implemented in continouous tasks for diversity of samples as opposed to setting a time limit on success. -->
 
 <!-- If your value function is mostly accurate and the values are changing slowly, bootstrapping can help. Otherwise, it can introduce instability (value function overestimation). -->
 
@@ -302,10 +315,12 @@ Code examples:
 - [pytorch-a2c-ppo-acktr-gail](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L86)
     - In this computation, the tensor `self.bad_masks` indicates when bootstrapping should occur. If its value is 0, then the reward at the terminal timestep is replaced with the value estimate of the terminal state.
 - [RL Games](https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474)
-    - As far as I can tell, RL Games does not do any bootstrapping of timeout terminations (no extra information about terminations is received from environments). I added bootstrapping to the function linked above in my own fork and found that performance actually decreased.
 
 
 ### Generalized Advantage Estimation
+
+TODO: add stuff for bootstrapping and terminal states.
+
 Generalized Advantage Estimation (GAE), from the paper from the paper [High-Dimensional Continuous Control Using Generalized Advantage Estimation](https://arxiv.org/pdf/1506.02438.pdf), provides a continuous bias-variance tradeoff through controlling the amount of bootstrapping via a parameter $\lambda$. The formula for computing advantages is given below, but I highly recommend reading the actual paper if you are going to program this yourself.
 
 {{<math>}}$$ \hat{A}^{GAE(\gamma, \lambda)}_t = \sum^\infty_{l=0} (\gamma \lambda)^l \delta^V_{t+l} $$ {{</math>}}
@@ -314,13 +329,35 @@ Generalized Advantage Estimation (GAE), from the paper from the paper [High-Dime
 
 The TD-learning value update is a special case of GAE when $\lambda = 0$. When $\lambda = 1$, no bootstrapping occurs. Most of the time, I set $\gamma = 0.99$ and $\lambda = 0.95$.
 
+The above two equations from the paper deal with the infinite time horizon case. Dealing with terminations and bootstrapping in the finite-horizon case can be confusing, so I've provided some equations below. Again, assume these are estimates of advantages and values from a single trajectory from $s_0$ to $s_H$ where truncation occurs at timestep $h < H$.
+
+**Finite time horizon, no bootstrapping (full episode)**<br>
+Note that $\delta_H$ becomes $r_H - V(s_H)$ because $V(s_{H+1})$ is zero.
+<br>
+
+{{<math>}}$$\hat{A}^{GAE(\gamma, \lambda)}_t= \sum_{t=0}^{H-1} (\gamma \lambda)^t \delta^t + (\gamma \lambda)^H (r_H - V(s_H))$${{</math>}}
+{{<math>}}$$\hat{V}^{GAE(\gamma, \lambda)}_t= \hat{A}^{GAE(\gamma, \lambda)}_t + V(s_o)$${{</math>}}
+
+<br>
+
+**Finite time horizon with bootstrapping** <br>
+Note that $r_h$ is replaced with $V(s_h)$, which makes the final term zero.
+
+{{<math>}}$$\hat{A}^{GAE(\gamma, \lambda)}_t= \sum_{t=0}^{h-1} (\gamma \lambda)^t \delta^t $${{</math>}}
+{{<math>}}$$\hat{V}^{GAE(\gamma, \lambda)}_t= \hat{A}^{GAE(\gamma, \lambda)}_t + V(s_o)$${{</math>}}
+
+
+
+
 Code examples:
 - [pytorch-a2c-ppo-acktr-gail](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/efc71f600a2dca38e188f18ca85b654b37efd9d2/a2c_ppo_acktr/storage.py#L73)
 - [RL Games](https://github.com/Denys88/rl_games/blob/d6ccfa59c85865bc04d80ca56b3b0276fec82f90/rl_games/common/a2c_common.py#L474)
+     - As far as I can tell, RL Games does not do any bootstrapping of truncated episodes or timeouts. No information about the nature of terminations is received from the environment, and there is no condition where the advantage of a timestep is set to zero.
+
 
 
 ### Entropy Decay
-The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want more exploration early in training. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during sample collection. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying desired entropy to zero may yield the desired the exploration-explotation behavior.
+The exploration-exploitation tradeoff is a fundamental problem in RL which is usually dealt with through experimentation or hyperparamter tuning. Generally, you want more exploration early in training. The most basic way to increase exploration is to increase the entropy of the policy used to obtain environment samples. Assuming the policy outputs to a Gaussian distribution over actions, the entropy is proportional to the log of the variance. In on-policy algorithms like TRPO and PPO, entropy can be controlled indirectly via a loss term that reward entropy. In off-policy algorithms like DDPG, SAC, or TD3, noise is added to the output of a deterministic policy during sample collection. The entropy of the sampling process can be directly controlled via this noise. Starting with a high entropy coefficient/high-variance noise and decaying desired entropy to zero may yield the desired exploration-explotation behavior.
 
 
 In my own work in legged locomotion, I have often found this uncessary. The majority of the time, I use PPO and set the entropy coefficient to 0.0 for the entirety of training. Perhaps the chaotic underactuated dynamics of a legged robot eliminates the need for extra exploration noise.
@@ -336,7 +373,7 @@ Code example for PPO:
  You can just decrease this entropy coefficient. In off policy algorithms like DDPG, SAC, or TD3, you have exploration during data collection and you can just decrease the variance of the distribution of the noise you add to policy output for exploration. -->
 
 ### Value Network Loss Clipping
-This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce very large errors can occur. The MSE loss can be clipped from [-k, k] where k is usually around 0.2.
+This is another trick aimed at controlling the behavior of the gradients. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce very large errors can occur. The MSE loss can be clipped from [-k, k] where k is usually around 0.2.  # TODO this is not 100% correct is it? I'm clipping something else to 0.2.
 
 
 Code Examples:

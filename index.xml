@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link><atom:link href="https://jmcoholich.github.io/index.xml" rel="self" type="application/rss+xml"/><description>Jeremiah Coholich</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Tue, 31 May 2022 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link></image><item><title>A Bag of Tricks for Deep Reinforcement Learning</title><link>https://jmcoholich.github.io/post/rl_lessons/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/rl_lessons/</guid><description>&lt;!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link><atom:link href="https://jmcoholich.github.io/index.xml" rel="self" type="application/rss+xml"/><description>Jeremiah Coholich</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Tue, 31 May 2022 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Jeremiah Coholich</title><link>https://jmcoholich.github.io/</link></image><item><title>A Bag of Tricks for Deep Reinforcement Learning</title><link>https://jmcoholich.github.io/post/rl_bag_of_tricks/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/rl_bag_of_tricks/</guid><description>&lt;!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
 &lt;!-- Outline of this post
 1. RL is a very exciting and promising field
 2. BUT its hard to reproduce results and hard to apply to new fields
@@ -71,10 +71,10 @@ Altough PPO is a SOTA algorithm, implementing pseudocode directly from the PPO p
 &lt;figure >
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img alt="pic" srcset="
-/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp 400w,
-/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_f3c994e5b8222cfd49a9dd4f22fd932e.webp 760w,
-/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
-src="https://jmcoholich.github.io/post/rl_lessons/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp"
+/post/rl_bag_of_tricks/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp 400w,
+/post/rl_bag_of_tricks/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_f3c994e5b8222cfd49a9dd4f22fd932e.webp 760w,
+/post/rl_bag_of_tricks/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
+src="https://jmcoholich.github.io/post/rl_bag_of_tricks/obs_norm_dip_hu981de4d7338294a9cd2c2fae25e4020c_71749_cb7351224d24cbd48db808cd6bb44e05.webp"
 width="760"
 height="380"
 loading="lazy" data-zoomable />&lt;/div>
@@ -271,10 +271,10 @@ You can just decrease this entropy coefficient. In off policy algorithms like DD
 &lt;figure >
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img alt="pic" srcset="
-/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp 400w,
-/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_b7bf57980ec21268496775759909e319.webp 760w,
-/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
-src="https://jmcoholich.github.io/post/rl_lessons/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp"
+/post/rl_bag_of_tricks/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp 400w,
+/post/rl_bag_of_tricks/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_b7bf57980ec21268496775759909e319.webp 760w,
+/post/rl_bag_of_tricks/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_1200x1200_fit_q75_h2_lanczos_3.webp 1200w"
+src="https://jmcoholich.github.io/post/rl_bag_of_tricks/adaptive_lr_hu195bc64329187de28f24674117a3749b_108774_c1d09df98d6fcc1d90dd947d5349c4c8.webp"
 width="760"
 height="263"
 loading="lazy" data-zoomable />&lt;/div>

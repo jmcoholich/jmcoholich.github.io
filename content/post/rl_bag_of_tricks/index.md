@@ -149,6 +149,7 @@ In supervised learning, statistics calculated over the training set are used to 
 This online approach is best when your algorithm needs to work on many different environments. However, it often causes an initial drop in performance (red circle below) as the mean and standard deviation move rapidly early in training due a small sample size and exploration.
 
 ![pic](obs_norm_dip.png)
+*An initial drop in performance caused by normalization statistics moving faster than the policy updates.*
 <!-- Do this because optimization is much more effective when the different inputs are all the same scale, speeds up learning, and leads to faster convergence. Also avoid clipping to get rid of random or unexpected outliers, and because neural networks are bad at extrapolating. -->
 
 Alternatively, if you have good prior knowledge about the bounds of the observation space, you can just rescale your data to the range [-1, 1] or [0, 1], like what they do [here](https://github.com/leggedrobotics/legged_gym/blob/dd6a6892e54c4f111a203319c05da8dca9595ae1/legged_gym/envs/base/legged_robot.py#L212).
@@ -374,12 +375,23 @@ Code example:
 ### Value Network Loss Clipping
 This is another trick aimed at controlling the behavior of the gradients and preventing excessively large updates. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce large errors can occur.
 
-Value network loss clipping roughly constrains the change in value estimates between policy iterations to a "trust region" of $\pm\ \epsilon$ from the old value estimates (equation below). (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.)
+Value network loss clipping roughly constrains the change in value estimates between policy iterations to a "trust region" of $\pm\ \epsilon$ from the old value estimates. (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.) The loss calculation is given below, where backpropogation happens through $V_{new}(s_0)$ only.
 
-{{<math>}}$$\text{Update if:} \ V_{new}(s_0) \in \left[V_{old}(s_0) - \epsilon, V_{old}(s_0) + \epsilon\right] $$ $$OR\ \
- |V_{old} - V_{target}| < |V_{old} - V_{new}|$$ {{</math>}}
+<!-- {{<math>}}$$\text{Update if:} \ V_{new}(s_0) \in \left[V_{old}(s_0) - \epsilon, V_{old}(s_0) + \epsilon\right] $$ $$OR\ \
+ |V_{old} - V_{target}| < |V_{old} - V_{new}|$$ {{</math>}} -->
+{{<math>}}$$ V_{clip}(s_0) = V_{old}(s_0) + \text{Clip}(V_{new}(s_0) - V_{old}(s_0),\ - \epsilon,\ \epsilon) $$
+$$\mathcal{L}_{\text{MSE-Clip}} = (V_{clip}(s_0) - V_{target}(s_0))^2 $$
+$$\mathcal{L}_{\text{MSE}} = (V_{new}(s_0) - V_{target}(s_0))^2 $$
+$$\mathcal{L}_{\text{final}} = \text{max}(\mathcal{L}_{\text{MSE-Clip}}, \mathcal{L}_{\text{MSE}})$$ {{</math>}}
 
-Once a new value estimates is outside the trust region, no gradient will be calculated. $\epsilon$ is usually set to something like $0.2$. Note that $V_{t+1}(s_0)$ could end up slightly outside of $\left[V_{t}(s_0) - \epsilon, V_{t}(s_0) + \epsilon\right]$. This is because the values themselves are not clipped, rather, the updates to the value function stop happening after the new value is outside the clipped range. This could also be due to parameter updates from loss terms corresponding to states other than $s_0$.
+ $\epsilon$ is usually set to something like $0.2$. Note that $V_{new}(s_0)$ could end up slightly outside of $\left[V_{old}(s_0) - \epsilon, V_{old}(s_0) + \epsilon\right]$. This is because the values themselves are not clipped, rather, the updates to the value function stop happening when clipping occurs ($\epsilon$ is just a constant with no dependency on the value network parameters -- no backprop can occur through $\epsilon$). This could also be due to parameter updates from loss terms corresponding to states other than $s_0$.
+
+ Honestly, the clipped value update is rather confusing, especially at first. In my analysis, I discovered an edge case where value updates should occur, but don't (figure below). Moving $V_{new}$ in the direction of $V_{target}$ will move $V_{new}$ closer to the trust region, but this update doesn't occur because the distance from the nearest edge of the trust region to $V_{target}$ is greater than the distance between $V_{target}$ and $V_{new}$. However, perhaps the clipped MSE loss makes it unlikely that $V_{new}$ will end up far outside the trust region in the first place.
+
+
+
+![pic](value_edge_case.svg)
+*An edge case in the value network loss clipping trick, where updates to $V_{new}$ in the direction of $V_{old}$ are prevented.*
 
 <!-- The MSE loss can be clipped from [-k, k] where k is usually around 0.2. -->
 

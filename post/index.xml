@@ -265,7 +265,9 @@ $$\mathcal{L}_{\text{final}} = \text{max}(\mathcal{L}_{\text{MSE-Clip}}, \mathca
 &lt;p>
 &lt;figure >
 &lt;div class="d-flex justify-content-center">
-&lt;div class="w-100" >&lt;img src="value_edge_case.svg" alt="pic" loading="lazy" data-zoomable />&lt;/div>
+&lt;div class="w-100" >&lt;img alt="pic"
+src="https://jmcoholich.github.io/post/rl_bag_of_tricks/value_edge_case.svg"
+loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;/figure>
 &lt;em>An edge case in the value network loss clipping trick, where updates to $V_{new}$ in the direction of $V_{old}$ are prevented.&lt;/em>&lt;/p>
 &lt;!-- The MSE loss can be clipped from [-k, k] where k is usually around 0.2. -->

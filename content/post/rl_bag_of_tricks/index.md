@@ -83,7 +83,7 @@ Different RL implementations will include a slightly different set of tricks. As
 <p>
 <img src=fig_6_drl_that_matters.png width=75%>
 
-<em>Figure 6 from [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf), plotting the performance of different RL implementations averaged over 5 random seeds</em>
+<em>Figure 6 from [Deep Reinforcement Learning that Matters](https://arxiv.org/pdf/1709.06560.pdf), plotting the performance of different RL implementations averaged over 5 random seeds. These variations can be explained by differences in implementation and different PyTorch/TF versions.</em>
 </p>
 
 
@@ -374,11 +374,12 @@ Code example:
 ### Value Network Loss Clipping
 This is another trick aimed at controlling the behavior of the gradients and preventing excessively large updates. The value function is trained on a mean-squared error (MSE) loss where the target values are value estimates from policy rollouts. This is contrast to supervised learning, where the targets are stationary ground-truth labels. Because the targets themselves are estimates derived from a stochastic sampling process, inaccurate targets which produce large errors can occur.
 
-Value network loss clipping constrains the change in value estimates between policy iterations to a "trust region" of $\pm\ \epsilon$ from the old value estimates (equation below). (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.)
+Value network loss clipping roughly constrains the change in value estimates between policy iterations to a "trust region" of $\pm\ \epsilon$ from the old value estimates (equation below). (Constraining updates to a trust region is the central idea behind TRPO and PPO, but for action probabilities instead of value estimates.)
 
-$$V_t(s_0) \in \left[V_{t-1}(s_0) - \epsilon, V_{t-1}(s_0) + \epsilon\right]$$
+{{<math>}}$$\text{Update if:} \ V_{new}(s_0) \in \left[V_{old}(s_0) - \epsilon, V_{old}(s_0) + \epsilon\right] $$ $$OR\ \
+ |V_{old} - V_{target}| < |V_{old} - V_{new}|$$ {{</math>}}
 
-Once the new value estimates are at the edge of the trust region, no gradient will be calculated for target values outside of the trust region. $\epsilon$ is usually set to something like $0.2$.
+Once a new value estimates is outside the trust region, no gradient will be calculated. $\epsilon$ is usually set to something like $0.2$. Note that $V_{t+1}(s_0)$ could end up slightly outside of $\left[V_{t}(s_0) - \epsilon, V_{t}(s_0) + \epsilon\right]$. This is because the values themselves are not clipped, rather, the updates to the value function stop happening after the new value is outside the clipped range. This could also be due to parameter updates from loss terms corresponding to states other than $s_0$.
 
 <!-- The MSE loss can be clipped from [-k, k] where k is usually around 0.2. -->
 

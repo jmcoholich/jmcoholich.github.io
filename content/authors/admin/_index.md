@@ -33,7 +33,7 @@ education:
       year: 2025 (expected)
     - course: MS in Computer Science
       institution: Georgia Institute of Technology
-      year: 2022 (expected)
+      year: 2022
     - course: BS in Mechanical Engineering, Highest Honors
       institution: The University of Texas at Austin
       year: 2019
@@ -64,7 +64,7 @@ social:
 # and uncomment the lines below.
   - icon: cv
     icon_pack: ai
-    link: 'uploads/CV_Fall_2022.pdf'
+    link: 'uploads/CV_Spring_2023.pdf'
 
 # Enter email to display Gravatar (if Gravatar enabled in Config)
 email: ''
@@ -72,8 +72,8 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-**Update**: I am currently looking for a full-time position as an R&D engineer in machine learning or robotics.
-Here is my {{< staticref "uploads/Resume_Fall_2022.pdf" "newtab" >}}resumé{{< /staticref >}}.
+**Update**: I am currently looking for a summer internship related to my research interests.
+Here is my {{< staticref "uploads/Resume_Spring_2023.pdf" "newtab" >}}resumé{{< /staticref >}}.
 <!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 
 I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust is the application of reinforcement learning to robotics and legged locomotion. I am also interested in using learned priors to increase sample efficiency and decrease reward engineering required in reinforcement learning for real-world tasks.

@@ -72,11 +72,11 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-**Update**: I am currently looking for a summer internship related to my research interests.
-Here is my {{< staticref "uploads/Resume_Spring_2023.pdf" "newtab" >}}resumé{{< /staticref >}}.
+<!-- **Update**: I am currently looking for a summer internship related to my research interests.
+Here is my {{< staticref "uploads/Resume_Spring_2023.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 <!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 
-I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust is the application of reinforcement learning to robotics and legged locomotion. I am also interested in using learned priors to increase sample efficiency and decrease reward engineering required in reinforcement learning for real-world tasks.
+I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust is the application of reinforcement learning to robotics and legged locomotion. I am also interested in using learned priors to increase sample efficiency and decrease reward engineering required in reinforcement learning for real-world tasks. This summer I will be interning at [Honda Research Institute](https://usa.honda-ri.com/) working on dexterous manipulation. 
 
 During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I had the pleasure of working with [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/electric-vehicle).
 

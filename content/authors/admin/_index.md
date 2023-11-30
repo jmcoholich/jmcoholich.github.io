@@ -75,9 +75,9 @@ highlight_name: true
 Here is my {{< staticref "uploads/Resume_Spring_2023.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 <!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
 
-I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning. 
+I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning.
 
-In the summer of 2023 I was an intern at [Honda Research Institute](https://usa.honda-ri.com/) working on dexterous manipulation under [Jinda Cui](https://www.jindacui.net/) and [Soshi Iba](https://www.linkedin.com/in/soshi-iba-7090467/). 
+In the summer of 2023 I was an intern at [Honda Research Institute](https://usa.honda-ri.com/) working on deep learning-based dexterous manipulation under [Jinda Cui](https://www.jindacui.net/) and [Soshi Iba](https://www.linkedin.com/in/soshi-iba-7090467/).
 
 During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I had the pleasure of working with [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/).
 

@@ -11,7 +11,7 @@ headless: true
 weight: 51
 # active: false
 
-title: Unpublished
+title: Course Projects
 subtitle: ''
 
 content:

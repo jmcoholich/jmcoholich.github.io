@@ -1,11 +1,13 @@
 ---
-title: 'Learning High-Value Footstep Placements for Quadruped Robots'
-draft: True
+title: 'Hierarchical Reinforcement Learning and Value Optimization for Challenging Quadruped Locomotion'
+
 # Authors
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
 # and it will be replaced with their full name and linked to their profile.
 authors:
   - Jeremiah M Coholich
+  - Muhammad Ali Murtaza
+  - Seth Hutchinson
   - Zsolt Kira
 
 # # Author notes (optional)
@@ -23,43 +25,42 @@ doi: ''
 # Legend: 0 = Uncategorized; 1 = Conference paper; 2 = Journal article;
 # 3 = Preprint / Working Paper; 4 = Report; 5 = Book; 6 = Book section;
 # 7 = Thesis; 8 = Patent
-publication_types: ['3']
+publication_types: ['1']
 
 # Publication name and optional abbreviated publication name.
-publication: Masters thesis topic
-publication_short: Masters thesis topic
+publication:
+publication_short:
 
-abstract: "Learning policies for quadruped locomotion from
-scratch with reinforcement learning is challenging and motivates
-the need for behavioral priors. In this paper, we demonstrate that
-the combination of two such priors, gait trajectory generators
-and foot placement selection, are effective means to train robust
-policies. We specifically aim to learn a locomotion policy over a
-terrain consisting of stepping stones, where footstep placements
-are limited. To do this, we aim to add a behavioral prior
-for choosing footstep placements proposing a method to choose
-footstep targets which are optimal according to the value function
-of a policy trained to hit random footstep targets. We implement
-this method in simulation on flat ground and a difficult stepping
-stones terrain with some success and hypothesize about directions
-of future work which could improve our approach."
+abstract: "We propose a novel hierarchical reinforcement
+learning framework for quadruped locomotion over challenging
+terrains. Our approach incorporates a two-layer hierarchy where
+a high-level planner (HLP) selects optimal goals for a low-level
+policy (LLP). The LLP is trained using an on-policy actor-critic
+RL algorithm and is given footstep placements as goals. The
+HLP does not require any additional training or environment
+samples, since it operates via an online optimization process over
+the value function of the LLP. We demonstrate the benefits of this
+framework by comparing it against an end-to-end reinforcement
+learning (RL) approach, highlighting improvements in its ability
+to achieve higher rewards with fewer collisions across an array
+of different terrains."
 
 # Summary. An optional shortened abstract.
-summary: A method for choosing footstep placements over rough terrain which leverages a value function trained with reinforcement learning
-tags: ['unpublished']
+summary: Under Review
+tags: ['published']
 
 # Display this page in the Featured widget?
-featured: false
+featured: true
 
 # Custom links (uncomment lines below)
 # links:
 # - name: Custom
 #   url: "quadruped_footsteps.pdf"
 
-url_pdf: ''
-url_code: 'https://github.com/jmcoholich/isaacgym'
+url_pdf: 'ACC_2025_Submission_Coholich.pdf'
+url_code: ''
 url_dataset: ''
-url_poster: 'NDSEG_Poster_Jeremiah_Coholich.pdf'
+url_poster: ''
 url_project: ''
 url_slides: ''
 url_source: ''
@@ -70,7 +71,7 @@ url_video: ''
 image:
   caption: 'The proposed planning and control architecture'
   focal_point: ''
-  preview_only: true
+  preview_only: false
 
 # Associated Projects (optional).
 #   Associate this publication with one or more of your projects.

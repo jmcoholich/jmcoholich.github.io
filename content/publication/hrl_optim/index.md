@@ -57,8 +57,8 @@ featured: true
 # - name: Custom
 #   url: "quadruped_footsteps.pdf"
 
-url_pdf: 'asdf.pdf'
-url_code: ''
+url_pdf: ''
+url_code: 'https://github.com/jmcoholich/isaacgym'
 url_dataset: ''
 url_poster: ''
 url_project: ''

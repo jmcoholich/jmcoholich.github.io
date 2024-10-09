@@ -57,7 +57,7 @@ featured: true
 # - name: Custom
 #   url: "quadruped_footsteps.pdf"
 
-url_pdf: 'ACC_2025_Submission_Coholich.pdf'
+url_pdf: 'ACC_Submission_Coholich.pdf'
 url_code: ''
 url_dataset: ''
 url_poster: ''

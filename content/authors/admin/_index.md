@@ -73,7 +73,9 @@ email: ''
 highlight_name: true
 ---
 **Update**: I am currently looking for a summer internship related to robotics and Vision-Language-Action (VLA) models.
+
 <!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. --->
+
 
 I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning.
 
@@ -83,3 +85,9 @@ During my bachelor's degree, I was an undergraduate research assistant in the [H
 
 I also enjoy hiking, running, and rock climbing.
 
+Check out the new VR teleoperated setup I put together:
+
+<!-- {{< youtube 0uvbwTsbUGk >}} -->
+<div style="max-width: 600px;">
+  {{< youtube 0uvbwTsbUGk >}}
+</div>

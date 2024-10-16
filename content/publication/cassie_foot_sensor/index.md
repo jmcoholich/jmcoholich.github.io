@@ -38,7 +38,7 @@ publication_short: In IEEE RoboSoft
 abstract: Dynamic legged locomotion is being explored as a means to maneuver on rugged and unstructured terrains. However, limited foot contact sensing capabilities often prohibit bipedal robots from being deployed on complex terrains. Locomotion over cluttered outdoor environments requires the contacting foot to be aware of terrain geometries, stiffness, and granular media properties. To achieve this, we designed a new soft contact pad integrated with a variety of embedded sensors, including tactile, acoustic, capacitive, and temperature sensors, as well as an accelerometer. In addition, we devised a terrain classification algorithm based on features extracted from those sensors and various real-world terrains. The classifier uses these features as inputs and classifies various terrains via Random Forests and a memory function. Our cross-validation tests demonstrate that the proposed classification algorithm achieves an accuracy of about 96.5%, manifesting the applicability of this foot sensing device to bipedal locomotion over diverse terrains.
 
 # Summary. An optional shortened abstract.
-summary: Embedding sensors into a robotic foot and using them classify terrain with machine learning
+summary: 2020 3rd IEEE International Conference on Soft Robotics (RoboSoft)
 
 tags: ['published']
 

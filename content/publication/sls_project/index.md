@@ -40,7 +40,7 @@ thickness. Results show that total energy density is correlated to both and mass
 volumetric energy density."
 
 # Summary. An optional shortened abstract.
-summary: Characterizing the structual effects of laser energy density on 3D-printed nylon
+summary: CIRP Annals, 2017, Manufacturing Technology
 
 tags: ['published']
 

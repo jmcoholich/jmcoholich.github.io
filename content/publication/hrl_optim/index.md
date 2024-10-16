@@ -46,7 +46,7 @@ to achieve higher rewards with fewer collisions across an array
 of different terrains."
 
 # Summary. An optional shortened abstract.
-summary: Under Review
+summary: Submitted to 2025 American Control Conference (ACC)
 tags: ['published']
 
 # Display this page in the Featured widget?

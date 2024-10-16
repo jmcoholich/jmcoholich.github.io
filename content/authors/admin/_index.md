@@ -20,9 +20,10 @@ bio: My research interests include deep learning, reinforcement learning, and le
 
 # Interests to show in About widget
 interests:
-  - Reinforcement Learning
-  - Computer Vision
   - Robotics
+  - Computer Vision
+  - Imitation Learning
+  - Reinforcement Learning
 
 # Education to show in About widget
 education:
@@ -71,9 +72,8 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-<!-- **Update**: I am currently looking for a summer internship related to my research interests.
-Here is my {{< staticref "uploads/Resume_Spring_2023.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
-<!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
+**Update**: I am currently looking for a summer internship related to robotics and Vision-Language-Action (VLA) models.
+<!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. --->
 
 I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning.
 

@@ -56,7 +56,7 @@ Our methods are validated on a single-degree-of-freedom elbow
 exoskeleton."
 
 # Summary. An optional shortened abstract.
-summary: Designing hardware and a control algorithm for an adjustable-stiffness arm exoskeleton
+summary: 2019 IEEE/ASME International Conference on Advanced Intelligent Mechatronics (AIM)
 
 tags: ['published']
 

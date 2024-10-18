@@ -30,7 +30,7 @@ education:
   courses:
     - course: PhD in Robotics
       institution: Georgia Institute of Technology
-      year: 2025 (expected)
+      year: Dec 2025 (expected)
     - course: MS in Computer Science
       institution: Georgia Institute of Technology
       year: 2022
@@ -64,7 +64,7 @@ social:
 # and uncomment the lines below.
   - icon: cv
     icon_pack: ai
-    link: 'uploads/CV_Fall_2023.pdf'
+    link: 'uploads/CV_Fall_2024.pdf'
 
 # Enter email to display Gravatar (if Gravatar enabled in Config)
 email: ''
@@ -73,9 +73,8 @@ email: ''
 highlight_name: true
 ---
 **Update**: I am currently looking for a summer internship related to robotics and Vision-Language-Action (VLA) models.
-
-<!-- {{< icon name="download" pack="fas" >}} Here is my {{< staticref "uploads/Resume_Summer_2022.pdf" "newtab" >}}resumé{{< /staticref >}}. --->
-
+ Here is my {{< staticref "uploads/Resume_Fall_2024.pdf" "newtab" >}}resumé{{< /staticref >}}.
+<!-- {{< icon name="download" pack="fas" >}} -->
 
 I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning.
 

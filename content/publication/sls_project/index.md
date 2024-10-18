@@ -40,7 +40,7 @@ thickness. Results show that total energy density is correlated to both and mass
 volumetric energy density."
 
 # Summary. An optional shortened abstract.
-summary: CIRP Annals, 2017, Manufacturing Technology
+summary: CIRP Annals Manufacturing Technology Vol. 1, 66, 2017
 
 tags: ['published']
 

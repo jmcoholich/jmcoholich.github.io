@@ -1,13 +1,12 @@
 ---
-title: 'Hierarchical Reinforcement Learning and Value Optimization for Challenging Quadruped Locomotion'
+title: 'Sim2real Image Translation Enables ViewpointRobust Policies from Fixed-Camera Datasets'
 
 # Authors
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
 # and it will be replaced with their full name and linked to their profile.
 authors:
   - Jeremiah Coholich
-  - Muhammad Ali Murtaza
-  - Seth Hutchinson
+  - Justin Wit
   - Zsolt Kira
 
 # # Author notes (optional)
@@ -15,7 +14,7 @@ authors:
 #   - 'Equal contribution'
 #   - 'Equal contribution'
 
-date: '2025-04-25T00:00:00Z'
+date: '2025-05-02T00:00:00Z'
 doi: ''
 
 # Schedule page publish date (NOT publication's date).
@@ -31,24 +30,27 @@ publication_types: ['1']
 publication:
 publication_short:
 
-abstract: "We propose a novel hierarchical reinforcement
-learning framework for quadruped locomotion over challenging
-terrain. Our approach incorporates a two-layer hierarchy in
-which a high-level policy (HLP) selects optimal goals for a
-low-level policy (LLP). The LLP is trained using an on-policy
-actor-critic RL algorithm and is given footstep placements as
-goals. We propose an HLP that does not require any additional
-training or environment samples and instead operates via an
-online optimization process over the learned value function of
-the LLP. We demonstrate the benefits of this framework by
-comparing it with an end-to-end reinforcement learning (RL)
-approach. We observe improvements in its ability to achieve
-higher rewards with fewer collisions across an array of different
-terrains, including terrains more difficult than any encountered
-during training"
+abstract: "Vision-based policies for robot manipulation have
+achieved significant recent success, but are still brittle to
+distribution shifts such as camera viewpoint variations. One
+reason is that robot demonstration data used to train such
+policies often lacks appropriate variation in camera viewpoints.
+Simulation offers a way to collect robot demonstrations at
+scale with comprehensive coverage of different viewpoints, but
+presents a visual sim2real challenge. To bridge this gap, we
+propose an unpaired image translation method with a novel
+segmentation-conditioned InfoNCE loss, a highly-regularized
+discriminator design, and a modified PatchNCE loss. We find
+that these elements are crucial for maintaining viewpoint
+consistency during translation. For image translator training,
+we use only real-world robot play data from a single fixed
+camera but show that our method can generate diverse unseen
+viewpoints. We observe up to a 46% absolute improvement
+in manipulation success rates under viewpoint shift when we
+augment real data with our sim2real translated data."
 
 # Summary. An optional shortened abstract.
-summary: 2025 American Control Conference (ACC)
+summary: Submitted to 2025 International Conference on Intelligent Robots and Systems (IROS)
 tags: ['published']
 
 # Display this page in the Featured widget?
@@ -60,18 +62,18 @@ featured: true
 #   url: "quadruped_footsteps.pdf"
 
 url_pdf: ''
-url_code: 'https://github.com/jmcoholich/isaacgym'
+url_code: ''
 url_dataset: ''
 url_poster: ''
-url_project: ''
+url_project: 'https://sites.google.com/view/sim2real-viewpoints'
 url_slides: ''
 url_source: ''
-url_video: 'https://youtu.be/XPoqMJMQUJo'
+url_video: 'https://youtu.be/9iI0VzXBZn0?si=PtYQPP1VsEvaSBIj'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.
 image:
-  caption: 'The proposed planning and control architecture'
+  caption: 'Overview'
   focal_point: ''
   preview_only: false
 

@@ -12,8 +12,8 @@ role: Robotics PhD Student
 organizations:
   - name: Georgia Institute of Technology
     url: https://www.gatech.edu/
-  # - name: Robotics Perception and Learning (RIPL) Lab
-  #   url: https://faculty.cc.gatech.edu/~zk15/
+  - name: Robotics Perception and Learning (RIPL) Lab
+    url: https://faculty.cc.gatech.edu/~zk15/
 
 # Short bio (displayed in user profile at end of posts)
 bio: My research interests include deep learning, reinforcement learning, and legged robots.
@@ -30,7 +30,7 @@ education:
   courses:
     - course: PhD in Robotics
       institution: Georgia Institute of Technology
-      year: Dec 2025 (expected)
+      year: Summer 2026 (expected)
     - course: MS in Computer Science
       institution: Georgia Institute of Technology
       year: 2022
@@ -72,7 +72,7 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-**Update**: I am currently looking for a summer internship related to robotics and Vision-Language-Action (VLA) models.
+**Update**: I am currently looking for a Summer/Fall internship related to robotics and Vision-Language-Action (VLA) models.
  Here is my {{< staticref "uploads/Resume_Fall_2024.pdf" "newtab" >}}resumé{{< /staticref >}}.
 <!-- {{< icon name="download" pack="fas" >}} -->
 

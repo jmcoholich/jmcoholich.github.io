@@ -5,7 +5,7 @@ title: 'Hierarchical Reinforcement Learning and Value Optimization for Challengi
 # If you created a profile for a user (e.g. the default `admin` user), write the username (folder name) here
 # and it will be replaced with their full name and linked to their profile.
 authors:
-  - Jeremiah M Coholich
+  - Jeremiah Coholich
   - Muhammad Ali Murtaza
   - Seth Hutchinson
   - Zsolt Kira
@@ -33,20 +33,22 @@ publication_short:
 
 abstract: "We propose a novel hierarchical reinforcement
 learning framework for quadruped locomotion over challenging
-terrains. Our approach incorporates a two-layer hierarchy where
-a high-level planner (HLP) selects optimal goals for a low-level
-policy (LLP). The LLP is trained using an on-policy actor-critic
-RL algorithm and is given footstep placements as goals. The
-HLP does not require any additional training or environment
-samples, since it operates via an online optimization process over
-the value function of the LLP. We demonstrate the benefits of this
-framework by comparing it against an end-to-end reinforcement
-learning (RL) approach, highlighting improvements in its ability
-to achieve higher rewards with fewer collisions across an array
-of different terrains."
+terrain. Our approach incorporates a two-layer hierarchy in
+which a high-level policy (HLP) selects optimal goals for a
+low-level policy (LLP). The LLP is trained using an on-policy
+actor-critic RL algorithm and is given footstep placements as
+goals. We propose an HLP that does not require any additional
+training or environment samples and instead operates via an
+online optimization process over the learned value function of
+the LLP. We demonstrate the benefits of this framework by
+comparing it with an end-to-end reinforcement learning (RL)
+approach. We observe improvements in its ability to achieve
+higher rewards with fewer collisions across an array of different
+terrains, including terrains more difficult than any encountered
+during training"
 
 # Summary. An optional shortened abstract.
-summary: Submitted to 2025 American Control Conference (ACC)
+summary: 2025 American Control Conference (ACC)
 tags: ['published']
 
 # Display this page in the Featured widget?

@@ -55,9 +55,9 @@ tags: ['published']
 featured: true
 
 # Custom links (uncomment lines below)
-# links:
-# - name: Custom
-#   url: "quadruped_footsteps.pdf"
+links:
+- name: arXiv
+  url: "https://arxiv.org/abs/2506.20036"
 
 url_pdf: ''
 url_code: 'https://github.com/jmcoholich/isaacgym'

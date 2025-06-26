@@ -57,9 +57,9 @@ tags: ['published']
 featured: true
 
 # Custom links (uncomment lines below)
-# links:
-# - name: Custom
-#   url: "quadruped_footsteps.pdf"
+links:
+- name: CVPR 2025 Embodied AI Workshop Version
+  url: "CVPR_EAI_Workshop_2025.pdf"
 
 url_pdf: ''
 url_code: ''

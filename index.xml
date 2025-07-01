@@ -28,7 +28,7 @@ Click the &lt;em>Cite&lt;/em> button above to demo the feature to enable visitor
 Create your slides in Markdown - click the &lt;em>Slides&lt;/em> button to check out the example.
 &lt;/div>
 &lt;/div>
-Supplementary notes can be added here, including [code, math, and images](https://wowchemy.com/docs/writing-markdown-latex/). --></description></item><item><title>A Bag of Tricks for Deep Reinforcement Learning</title><link>https://jmcoholich.github.io/post/rl_bag_of_tricks/</link><pubDate>Tue, 31 May 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/rl_bag_of_tricks/</guid><description>&lt;!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
+Supplementary notes can be added here, including [code, math, and images](https://wowchemy.com/docs/writing-markdown-latex/). --></description></item><item><title>A Bag of Tricks for Deep Reinforcement Learning</title><link>https://jmcoholich.github.io/post/rl_bag_of_tricks/</link><pubDate>Sat, 17 Sep 2022 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/rl_bag_of_tricks/</guid><description>&lt;!-- This article is not an introduction for reinforcement learning and assumes you know what it is and are trying to get into it. -->
 &lt;!-- Outline of this post
 1. RL is a very exciting and promising field
 2. BUT its hard to reproduce results and hard to apply to new fields

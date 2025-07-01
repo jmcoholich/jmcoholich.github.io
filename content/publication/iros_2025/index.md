@@ -58,7 +58,9 @@ featured: true
 
 # Custom links (uncomment lines below)
 links:
-- name: CVPR 2025 Embodied AI Workshop Version
+- name: CVPR 2025 Embodied AI Workshop
+  url: "https://embodied-ai.org/cvpr2025/"
+- name: Workshop Version PDF
   url: "CVPR_EAI_Workshop_2025.pdf"
 
 url_pdf: ''

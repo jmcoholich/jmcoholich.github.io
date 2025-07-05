@@ -62,9 +62,15 @@ For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an 
 
 # LangSAM Overview
 
-LangSAM is really just a GitHub repository which combines the [Segment Anything](https://ai.meta.com/sam2/) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM.
+LangSAM is really just a GitHub repository which combines the [Segment Anything](https://ai.meta.com/sam2/) (SAM) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM. 
+
+The SAM model generates segmentation proposals for images that are aligned with points, bounding boxes, or text. Apparently Meta has not release a version with text conditioning, which is why LangSAM had to be created in the first place. SAM is a very powerful open-world model that can generate segmentations for anything in the image (as the name implies).
+
+{{< figure src="sam_overview.png" title="An overview of the Segment Anything model (Source: https://arxiv.org/abs/2304.02643)" >}}
+{{< figure src="sam_examples.png" title="Example images segmented by SAM containing 400 to 500 masks per image (Source: https://arxiv.org/abs/2304.02643)" >}}
 
 
+[Grounding DINO](https://arxiv.org/abs/2303.05499) was created by fusing a closed-set object detector, [DINO](https://arxiv.org/abs/2203.03605), with a text encoder, [BERT](https://arxiv.org/abs/1810.04805). The  result is an open-world object detector that takes a string of text and outputs bounding box proposals. LangSAM takes takes the bounding box proposals and feeds them into SAM to obtain a pixel-wise segmentation mask. This [blog post](https://lightning.ai/blog/lang-segment-anything-object-detection-and-segmentation-with-text-prompt) explains LangSAM in much more detail. 
 
 
 # "Off-the-shelf" Performance
@@ -87,6 +93,9 @@ These are the objects we purchased:
 - Plates: https://a.co/d/6hOiS2a
 
 The CAD models I created for each of them are available [here](https://github.com/jmcoholich/FoundationPose/tree/main/meshes).
+
+
+To initialize tracking, FoundationPose 
 
 <!-- ### First result
 
@@ -113,7 +122,13 @@ I modified the FoundationPose code to track all three cubes at once with a simpl
 Clearly there are some issues! The model is unable to track the blocks once they are moved.
 # FoundationPose + Mask Temporal Consistency
 
+
+
+We also reduced the thresholds to output more bounding boxes.
+
 {{< youtube NemeM3IC1gU >}}
+
+
 # FoundationPose + Labels
 
 With the help of ChatGPT, I wrote a labeling pipeline to provide labels for
@@ -174,6 +189,9 @@ We will switch back to simulation experiments
 A huge thanks to the FoundationPose authors for developing and releasing this model!
 
 ## References
+>Devlin, Jacob, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. "Bert: Pre-training of deep bidirectional transformers for language understanding." In Proceedings of the 2019 conference of the North American chapter of the association for computational linguistics: human language technologies, volume 1 (long and short papers), pp. 4171-4186. 2019.
+
+>Kirillov, Alexander, Eric Mintun, Nikhila Ravi, Hanzi Mao, Chloe Rolland, Laura Gustafson, Tete Xiao et al. "Segment anything." In Proceedings of the IEEE/CVF international conference on computer vision, pp. 4015-4026. 2023.
 
 >Liu, Shilong, Zhaoyang Zeng, Tianhe Ren, Feng Li, Hao Zhang, Jie Yang, Qing Jiang et al. "Grounding dino: Marrying dino with grounded pre-training for open-set object detection." In European Conference on Computer Vision, pp. 38-55. Cham: Springer Nature Switzerland, 2024.
 
@@ -185,7 +203,7 @@ A huge thanks to the FoundationPose authors for developing and releasing this mo
 
 >Wen, Bowen, Wei Yang, Jan Kautz, and Stan Birchfield. "Foundationpose: Unified 6d pose estimation and tracking of novel objects." In Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition, pp. 17868-17879. 2024.
 
-
+>Zhang, Hao, Feng Li, Shilong Liu, Lei Zhang, Hang Su, Jun Zhu, Lionel M. Ni, and Heung-Yeung Shum. "Dino: Detr with improved denoising anchor boxes for end-to-end object detection." arXiv preprint arXiv:2203.03605 (2022).
 
 <!-- Here is a good outline
 

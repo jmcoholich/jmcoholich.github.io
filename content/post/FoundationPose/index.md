@@ -58,8 +58,9 @@ For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an 
 
 {{< figure src="FounationPose_Fig2.jpg" title="FoundationPose method overview (Source: https://nvlabs.github.io/FoundationPose/)" >}}
 
-
 # LangSAM Overview
+
+LangSAM gives us segmentations for FoundationPose mask tracking initialization. We also want segmentation masks for everything.
 
 LangSAM is not a new method or architecture, but actually just code which combines the [Segment Anything](https://ai.meta.com/sam2/) (SAM) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM.
 
@@ -126,7 +127,19 @@ The prompts I used for each cube when running LangSAM were just "blue cube", "re
 
 The scoring function I used for temporal consisteny is: 
 
-$$ e = mc^2 $$
+$$ 
+x_t = \arg\min_{\mathbf{x}} \left|\mathbf{x}_{t - 1} - \mathbf{x}\right|_1 
+$$
+
+Where $\mathbf{x}$ is a vector representing a bounding box. 
+
+Or with Pytorch: 
+<pre style="font-size: 16px;color: rgb(17,179,33);background-color: black;">
+dist_score = -torch.sum(torch.abs(bbox - last_bbox))
+</pre>
+
+{{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
+{{< figure src="temporal_consistency_scores.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO" >}}
 
 I also stopped sampling so many points on the sphere bc I want the cubes to have a canonical orientation. Also, cubes are symmetrical along many axes, which means there are many possible solutions for rotation. In order to speed up inference and standarize the output orientation, I set the initial guess to the identity matrix instead of 240 rotations from the icosphere. In addition to standardizing the views, this resulted in a ~150% speedup.
 
@@ -137,6 +150,9 @@ Adding temporal consistency:
 We also reduced the thresholds to output more bounding boxes.
 
 {{< youtube NemeM3IC1gU >}}
+
+
+# show plates video failing without labels, then have a video with labels and succeeding.
 
 
 # FoundationPose + Labels
@@ -151,7 +167,16 @@ Below is a video of the segmentations I obtained for each object in each camera 
 
 {{< youtube mpcZWuTq7Bk >}}
 
-Here is the FoundationPose tracking using these masks
+And for the two other tasks: 
+Stack cups: 
+{{< youtube CHPH6GWDsuE >}}
+
+Stack plates: 
+{{< youtube ndTsDA_uEug >}}
+Here is the FoundationPose tracking using these masks for cups and plates
+
+(video)
+
 (video)
 
 The results are better, but the labeling effort is too much and obviously not scalable. The segmentations are obviously still not perfect. Its a lot of work to provide high-quality annotations for a whole video tracking multiple objects going in-and-out of occlusion.

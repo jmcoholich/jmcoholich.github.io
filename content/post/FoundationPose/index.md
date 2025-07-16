@@ -119,13 +119,21 @@ I modified the FoundationPose code to track all three cubes at once with a simpl
 Clearly there are some issues -- the model is unable to track the blocks once they are moved.
 
 # FoundationPose + Mask Temporal Consistency
-My first idea for improving these results was to condition the pose estimate for every frame (vs just the first frame) on segmentation masks from LangSAM. However, this presented its own problem: processing frames independantly for each thing is hard. 
+My first idea for improving these results was to condition the pose estimate for every frame on a segmentation masks from LangSAM (instead of just the first frame). Essentially, this offloads the challenge of object localization in 2D from FoundationPose to LangSAM. However, LangSAM doesn't work perfectly either. Using the same prompts for the same objects on every frame ("blue cube", "red cube", and "green cube"), this is what we get:  
 
 {{< youtube 2YxygrxXshY >}}
 
-The prompts I used for each cube when running LangSAM were just "blue cube", "red cube", and "green cube".
+(Note that we are running segmentation for every camera view and for the robot arm too, since we need this another robot preprocessing task.)
 
-The scoring function I used for temporal consisteny is: 
+Watch the top right view. When the red cube is manipulated, the LangSAM switches to the blue cube and later the green cube as the most likely bounding boxes. Finally, the LangSAM outputs a segmentation of the entire stack of cubes. However, all the segmentaitons at the first frame are correct, likely because none of the cubes are occluded by the gripper or stacked.
+
+In order to improve the segmentations, I added a temporal consistency scoring function to select bounding boxes from Grounded DINO.
+
+At each timestep, LangSAM outputs several bounding boxes, each with an alignment score. Here are the bounding boxes are scores for the first frame for the prompt "red cube". The highest scoring box is colored blue.
+
+{{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
+
+I created a new scoring function to reward consistency with the previous frame. This scoring function is used instead of the prompt-alignment score for all frames except for the first one. This function is: 
 
 $$ 
 x_t = \arg\min_{\mathbf{x}} \left|\mathbf{x}_{t - 1} - \mathbf{x}\right|_1 
@@ -138,16 +146,21 @@ Or with Pytorch:
 dist_score = -torch.sum(torch.abs(bbox - last_bbox))
 </pre>
 
-{{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
+Here is the second frame, with the temporal consistency scores displayed:
 {{< figure src="temporal_consistency_scores.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO" >}}
 
-I also stopped sampling so many points on the sphere bc I want the cubes to have a canonical orientation. Also, cubes are symmetrical along many axes, which means there are many possible solutions for rotation. In order to speed up inference and standarize the output orientation, I set the initial guess to the identity matrix instead of 240 rotations from the icosphere. In addition to standardizing the views, this resulted in a ~150% speedup.
+Here is another example from the side camera view (145th frame):
+{{< figure src="temporal_consistency_scores_2.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO, with many bounding box proposals" >}}
 
 Adding temporal consistency: 
 
 {{< youtube wh94Wax8fp8 >}}
 
-We also reduced the thresholds to output more bounding boxes.
+I also stopped sampling so many points on the sphere bc I want the cubes to have a canonical orientation. Also, cubes are symmetrical along many axes, which means there are many possible solutions for rotation. In order to speed up inference and standarize the output orientation, I set the initial guess to the identity matrix instead of 240 rotations from the icosphere. In addition to standardizing the views, this resulted in a ~150% speedup.
+
+
+
+<!-- We also reduced the thresholds to output more bounding boxes. -->
 
 {{< youtube NemeM3IC1gU >}}
 
@@ -158,6 +171,10 @@ We also reduced the thresholds to output more bounding boxes.
 # FoundationPose + Labels
 
 With this working, I added more tasks. Here were the intial results: 
+
+{{< youtube rUjEtP8KPmw >}}
+
+{{< youtube 3QjOZKr2tlg >}}
 
 You can see the tracking for each objects fails blah blah blah .Cups and plates are larger and occlude each other much more. Getting the masks is unrelaible due to occlusions and the objects going out-of-frame, or mostly out-of-frame. At the time, we were pushing for a deadline, so I decided spending some time adding labels to the videos was worth it. 
 
@@ -175,9 +192,8 @@ Stack plates:
 {{< youtube ndTsDA_uEug >}}
 Here is the FoundationPose tracking using these masks for cups and plates
 
-(video)
-
-(video)
+{{< youtube ilF_YeErRAM >}}
+{{< youtube G7xddmpxsf4 >}}
 
 The results are better, but the labeling effort is too much and obviously not scalable. The segmentations are obviously still not perfect. Its a lot of work to provide high-quality annotations for a whole video tracking multiple objects going in-and-out of occlusion.
 

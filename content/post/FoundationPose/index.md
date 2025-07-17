@@ -114,7 +114,8 @@ The model does much better, but still fails on the third camera which is much fa
 Still fails on this: -->
 
 I modified the FoundationPose code to track all three cubes at once with a simple "for" loop. Below are the initial results. I'm only running tracking on the front camera view.
-{{< youtube RMuq4seR2gc >}}
+
+{{< youtube CTuzFU3Y9gI >}}
 
 Clearly there are some issues -- the model is unable to track the blocks once they are moved.
 
@@ -146,62 +147,70 @@ Or with Pytorch:
 dist_score = -torch.sum(torch.abs(bbox - last_bbox))
 </pre>
 
+We also lower the "box_threshold" and "text_threshold" from 0.3 and 0.25 to 0.1 and 0.1. This means Grounded DINO will output more bounding box proposals for us to select from. 
+
 Here is the second frame, with the temporal consistency scores displayed:
 {{< figure src="temporal_consistency_scores.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO" >}}
 
 Here is another example from the side camera view (145th frame):
 {{< figure src="temporal_consistency_scores_2.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO, with many bounding box proposals" >}}
 
-Adding temporal consistency: 
+Below is are the segmentations for the same demo obtained with the temporal-consistency scoring function.
+{{< youtube i0zaNuNY9RM >}}
+Clearly, the tracking is much better now. Watching the top right view again, we can see that the red block is segmented the entire time, even during manipulation and stacking. However, there are still some small errors. For example, for cam 0 "Franka robot arm", the block is segmented instead of the robot (the tip of the gripper). This will be addressed in the next section.
 
-{{< youtube wh94Wax8fp8 >}}
-
-I also stopped sampling so many points on the sphere bc I want the cubes to have a canonical orientation. Also, cubes are symmetrical along many axes, which means there are many possible solutions for rotation. In order to speed up inference and standarize the output orientation, I set the initial guess to the identity matrix instead of 240 rotations from the icosphere. In addition to standardizing the views, this resulted in a ~150% speedup.
-
-
-
-<!-- We also reduced the thresholds to output more bounding boxes. -->
+Below is the video of the FoundationPose results where every frame is conditioned on the improved, temporally-consistency segmentations from LangSAM.
 
 {{< youtube NemeM3IC1gU >}}
 
+Now, the model is able to track each block throughout the demo. 
 
-# show plates video failing without labels, then have a video with labels and succeeding.
-
+You may also notice that the coordinate systems for each box are now aligned, in contrast to the first FoundationPose video. I realized that since cubes have many axes of symmetry, the icosphere of pose initializations lead to random cube orientations. I reduced the number of initial guesses to a single identity matrix which results in consistent cube pose estimates and a ~150% speedup of FoundationPose.
 
 # FoundationPose + Labels
 
-With this working, I added more tasks. Here were the intial results: 
+Occaisionally, LangSAM estimates are wrong even in the first frame, meaning temporal consistency only enforces an incorrect object segmentation. Additionally, sometimes the objects are occluded completely or leave the image entirely, making tracking impossible. Since we were gunning for a deadline and needed results quickly, I decided to manually add some labels to our collection of 60 demonstrations. With the help of ChatGPT, I wrote a labeling pipeline to step through each video and provide labels for object bounding boxes (which were then tracked with the temporal loss in unlabeled frames) and stop tracking. 
 
-{{< youtube rUjEtP8KPmw >}}
-
-{{< youtube 3QjOZKr2tlg >}}
-
-You can see the tracking for each objects fails blah blah blah .Cups and plates are larger and occlude each other much more. Getting the masks is unrelaible due to occlusions and the objects going out-of-frame, or mostly out-of-frame. At the time, we were pushing for a deadline, so I decided spending some time adding labels to the videos was worth it. 
-
-With the help of ChatGPT, I wrote a labeling pipeline to step through each video and provide labels for object bounding boxes (which were then tracked with the temporal loss in unlabeled frames) and stop tracking. 
+Here are the segmentations for cups with labels. They results are the same, except now blah blah blah.
 
 Below is a video of the segmentations I obtained for each object in each camera video: 
 
-{{< youtube mpcZWuTq7Bk >}}
+{{< youtube TDYzbGJ2REg >}}
 
-And for the two other tasks: 
+### Stack Cups and Stack Plates Tasks
+
+With this working, I ran the pipeline on two new tasks.
+
+Here is FoundationPose on Stack Plates without temporal consistency and labels:
+
+{{< youtube rUjEtP8KPmw >}}
+Tracking of the plates fails when they are lifted out of the scene and when they occluded each other on the rack.
+
+Here is it after:
+
+{{< youtube ilF_YeErRAM >}}
+Adding labels that tell FoundationPose when to stop and reinitialize tracking significantly improves the tracking.
+
+
+<!-- And for the two other tasks: 
 Stack cups: 
 {{< youtube CHPH6GWDsuE >}}
 
 Stack plates: 
-{{< youtube ndTsDA_uEug >}}
-Here is the FoundationPose tracking using these masks for cups and plates
+{{< youtube ndTsDA_uEug >}} -->
+Here is the before and after for the "stack cups" task. 
+{{< youtube 3QjOZKr2tlg >}}
 
-{{< youtube ilF_YeErRAM >}}
 {{< youtube G7xddmpxsf4 >}}
-
-The results are better, but the labeling effort is too much and obviously not scalable. The segmentations are obviously still not perfect. Its a lot of work to provide high-quality annotations for a whole video tracking multiple objects going in-and-out of occlusion.
+Much less of a difference is made here. 
 
 # Conclusion
+The results are better on stack plates and stack cups, but not perfect. 
+The labels make a much bigger differnce for the plates since they go off-screen and are occluded more. Providing high-quality annotations for a whole video tracking multiple objects going in-and-out of occlusion is a lot of work and is not scalable.
 
 For now, we've stopped using FoundationPose and are looking for other solutions. I talked to two other PhD students working on manipulation who had also tried to use FoundationPose and abandoned it, saying my video results were better than theirs even. However, for those interested in trying, here are some recommendations.
 
-My recommendations:
+### My Recommendations
 
 For real world robot experiments, if you need object pose tracking the best thing to have is motion capture. Second best would be putting several AprilTags on each object. Third best is something like FoundationPose or BundleSDF. To get good results with these models: 
 - Track large objects, or move RGBD camera closer

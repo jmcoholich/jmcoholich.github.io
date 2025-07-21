@@ -39,9 +39,9 @@ authors:
 # categories:
 #   - Demo
 ---
-This blog post is about my experience using [FoundationPose](https://nvlabs.github.io/FoundationPose/) with [LangSAM](https://github.com/luca-medeiros/lang-segment-anything). It is meant to provide provide advice for others and third-party results for reference. 
+This blog post is about my experience using [FoundationPose](https://nvlabs.github.io/FoundationPose/) with [LangSAM](https://github.com/luca-medeiros/lang-segment-anything). It is meant to provide advice for others and third-party results for reference.
 
-**TLDR;** FoundationPose is generally not good enough to provide ground-truth object poses for real-world robot manipulation tasks. The model works somewhat off-the-shelf, but stuggles significantly with small objects and occlusion. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. Also, see the [Conclusion](#conclusion).
+**TLDR;** FoundationPose is generally not good enough to provide ground-truth object poses for real-world robot manipulation tasks. The model works somewhat off-the-shelf, but struggles significantly with small objects and occlusion. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. Also, see the [Conclusion](#conclusion).
 
 <!-- Object state is an important property required for many robot planning methods. In simulation, this is readily available, but in the real world it must be measured or estimated. In our case, we were working on a data augmentation method that required object pose. I decided to use FoundationPose based on the recommendation of some of my colleagues. This was my first time using a pose tracking model, as they have recently only become good. Previously, I've used [AprilTags](https://april.eecs.umich.edu/software/apriltag) to track object poses. -->
 
@@ -62,13 +62,13 @@ For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an 
 
 LangSAM is not a new method or architecture, but actually just code which combines the [Segment Anything](https://ai.meta.com/sam2/) (SAM) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM.
 
-SAM is a powerful segmentation model that can generate pixelwise segmentations for anything in an image (as the name implies). SAM takes an image and a prompt then generates mask proposals for images that are aligned with the prompt. The prompt can either be points, a bounding box, or a text string.  However, Meta has not released a version of SAM with text conditioning. Fortunately, this capabitily can be reproduced with Grounding DINO.
+SAM is a powerful segmentation model that can generate pixelwise segmentations for anything in an image (as the name implies). SAM takes an image and a prompt and outputs a segmentation mask. The prompt can either be points, a bounding box, or a text string. However, Meta has not released a version of SAM with text conditioning. Fortunately, this capabitily can be reproduced by adding Grounding DINO.
 
 {{< figure src="sam_overview.png" title="An overview of the Segment Anything model (Source: https://arxiv.org/abs/2304.02643)" >}}
 {{< figure src="sam_examples.png" title="Example images segmented by SAM containing 400 to 500 masks per image (Source: https://arxiv.org/abs/2304.02643)" >}}
 
 
-[Grounding DINO](https://arxiv.org/abs/2303.05499) is an open-world object detector that takes a string of text and outputs bounding box proposals. It was created by fusing a closed-set object detector, [DINO](https://arxiv.org/abs/2203.03605), with a text encoder, [BERT](https://arxiv.org/abs/1810.04805).  LangSAM takes the bounding box proposals from Grounding DINO and feeds them into SAM to obtain a pixel-wise segmentation mask. This [blog post](https://lightning.ai/blog/lang-segment-anything-object-detection-and-segmentation-with-text-prompt) explains LangSAM in much more detail. 
+[Grounding DINO](https://arxiv.org/abs/2303.05499) is an open-world object detector that takes a string of text and outputs bounding box proposals. It was created by fusing a closed-set object detector, [DINO](https://arxiv.org/abs/2203.03605), with a text encoder, [BERT](https://arxiv.org/abs/1810.04805).  LangSAM takes the bounding box proposals from Grounding DINO and feeds them into SAM to obtain a pixel-wise segmentation mask. This [blog post](https://lightning.ai/blog/lang-segment-anything-object-detection-and-segmentation-with-text-prompt) explains LangSAM in much more detail.
 
 We have two reasons for using LangSAM: 
 - FoundationPose requires a segmentation mask of the tracked object(s) in the first frame to initialize pose estimation. 
@@ -78,7 +78,7 @@ We have two reasons for using LangSAM:
 # "Off-the-shelf" Performance
 FoundationPose requires RGBD video frames, a CAD model, camera intrinsics, and a binary segmentation mask of the tracked object in the first frame.
 
-Below is a visualization of our input video. Its is from a VR-teleoperated demonstration of a block-stacking task. 
+Below is a visualization of our input video. Its is a VR-teleoperated demonstration of a block-stacking task.
 
 {{< youtube 8bc508QxUwo >}}
 
@@ -125,7 +125,7 @@ I modified the FoundationPose code to track all three cubes at once with a simpl
 Clearly there are some issues -- the model is unable to track the blocks once they are moved.
 
 # FoundationPose + Mask Temporal Consistency
-My first idea for improving these results was to condition the pose estimate for every frame (vs just the first frame) on segmentation masks from LangSAM. This would partially offload the task of object localization from FoundationPose to LangSAM. Unfortunately, LangSAM doesn't work perfectly either. Below are the segmentations and bounding boxes obtained by  running LangSAM on every frame. The prompts are ("blue cube", "red cube", and "green cube").
+My first idea for improving these results was to condition the pose estimate for every frame on a segmentation masks from LangSAM (instead of just the first frame). Essentially, this offloads the challenge of object localization in 2D from FoundationPose to LangSAM. However, LangSAM doesn't work perfectly either. Using the same prompts for the same objects on every frame ("blue cube", "red cube", and "green cube"), this is what we get:
 
 {{< youtube 2YxygrxXshY >}}
 
@@ -135,20 +135,20 @@ As explained previously, bounding boxes from Grounding DINO are used to prompt S
 
 {{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
 
-In order to improve bounding box outputs in later frames, I added a temporal consistency scoring function to replace the text alignment score for all frames except the first one. This new score rewards consistency with the previous frame. This function is: 
+I created a new scoring function to reward consistency with the previous frame. This scoring function is used instead of the prompt-alignment score for all frames except for the first one. This function is:
 
-$$ 
-x_t = \arg\min_{\mathbf{x}} \left|\mathbf{x}_{t - 1} - \mathbf{x}\right|_1 
+$$
+x_t = \arg\min_{\mathbf{x}} \left|\mathbf{x}_{t - 1} - \mathbf{x}\right|_1
 $$
 
-Where $\mathbf{x}$ is a vector representing a bounding box. 
+Where $\mathbf{x}$ is a vector representing a bounding box.
 
-Or with Pytorch: 
+Or with Pytorch:
 <pre style="font-size: 16px;color: rgb(17,179,33);background-color: black;">
 dist_score = -torch.sum(torch.abs(bbox - last_bbox))
 </pre>
 
-We also lower the "box_threshold" and "text_threshold" from 0.3 and 0.25 to 0.1 and 0.1. This means Grounded DINO will output more bounding box proposals for us to select from. 
+We also lower the "box_threshold" and "text_threshold" from 0.3 and 0.25 to 0.1 and 0.1. This means Grounded DINO will output more bounding box proposals for us to select from.
 
 Here is the second frame, with the temporal consistency scores displayed:
 {{< figure src="temporal_consistency_scores.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO" >}}
@@ -164,7 +164,7 @@ Below is the video of the FoundationPose results where every frame is conditione
 
 {{< youtube NemeM3IC1gU >}}
 
-Now, the model is able to track each block throughout the demo. 
+Now, the model is able to track each block throughout the demo.
 
 You may also notice that the coordinate systems for each box are now aligned, in contrast to the first FoundationPose video. I realized that since cubes have many axes of symmetry, the icosphere of pose initializations lead to random cube orientations. I reduced the number of initial guesses to a single identity matrix which results in consistent cube pose estimates and a ~150% speedup of FoundationPose.
 
@@ -193,11 +193,11 @@ Here are the results after adding temporal consistency and labels:
 The labels that tell FoundationPose when to stop and reinitialize tracking significantly improves the pose estimates.
 
 
-<!-- And for the two other tasks: 
-Stack cups: 
+<!-- And for the two other tasks:
+Stack cups:
 {{< youtube CHPH6GWDsuE >}}
 
-Stack plates: 
+Stack plates:
 {{< youtube ndTsDA_uEug >}} -->
 Here is the before and after for the stack-cups task. 
 {{< youtube 3QjOZKr2tlg >}}

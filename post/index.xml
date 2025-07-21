@@ -6,7 +6,14 @@
 &lt;p>For more details, see the &lt;a href="https://arxiv.org/abs/2312.08344" target="_blank" rel="noopener">paper&lt;/a>, however an in-depth understanding of FoundationPose is not required to use the model. Below is an overview of their method (Figure 2 from the paper).&lt;/p>
 &lt;figure id="figure-foundationpose-method-overview-source-httpsnvlabsgithubiofoundationpose">
 &lt;div class="d-flex justify-content-center">
-&lt;div class="w-100" >&lt;img src="FoundationPose_Fig2.jpg" alt="FoundationPose method overview (Source: https://nvlabs.github.io/FoundationPose/)" loading="lazy" data-zoomable />&lt;/div>
+&lt;div class="w-100" >&lt;img alt="FoundationPose method overview (Source: https://nvlabs.github.io/FoundationPose/)" srcset="
+/post/foundationpose/FoundationPose_Fig2_hu616dd80d5c866b1bb979f6032b3e916e_3171592_3f2cf6fdc080941240c64a0a9293bf06.webp 400w,
+/post/foundationpose/FoundationPose_Fig2_hu616dd80d5c866b1bb979f6032b3e916e_3171592_87a08ee161a4abc939e2140564ed7cfb.webp 760w,
+/post/foundationpose/FoundationPose_Fig2_hu616dd80d5c866b1bb979f6032b3e916e_3171592_1200x1200_fit_q75_h2_lanczos.webp 1200w"
+src="https://jmcoholich.github.io/post/foundationpose/FoundationPose_Fig2_hu616dd80d5c866b1bb979f6032b3e916e_3171592_3f2cf6fdc080941240c64a0a9293bf06.webp"
+width="760"
+height="488"
+loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;figcaption>
 FoundationPose method overview (Source: &lt;a href="https://nvlabs.github.io/FoundationPose/" target="_blank" rel="noopener">https://nvlabs.github.io/FoundationPose/&lt;/a>)
 &lt;/figcaption>&lt;/figure>

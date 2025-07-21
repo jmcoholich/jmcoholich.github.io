@@ -3,7 +3,7 @@ title: FoundationPose and LangSAM for Robotics
 subtitle: My experience running FoundationPose and LangSAM for monocular RGBD object pose tracking in a tabletop manipulation setting
 
 # Summary for listings and search engines
-summary: We combine three foundation models -- SAM, Grounded DINO, and FoundationPose -- for the purpose of running pose estimation on raw RGBD robot demonstrations. In order to improve results, we add a temporal consistency scoring function and various annotations to the data. Ultimately, the results are mixed and we are looking for ways to improve them further.
+summary: I used three foundation models -- SAM, Grounded DINO, and FoundationPose -- to obtain 6D pose estimates on raw RGBD robot demonstrations. In order to improve results, I added L1-consistent bounding boxes and various annotations to the data. Ultimately, the results were mixed, and we're still looking for improvements.
 # Link this post with a project
 projects: []
 
@@ -41,10 +41,7 @@ authors:
 ---
 This blog post is about my experience using [FoundationPose](https://nvlabs.github.io/FoundationPose/) with [LangSAM](https://github.com/luca-medeiros/lang-segment-anything). It is meant to provide advice for others and qualitative third-party results for reference.
 
-**TLDR;** FoundationPose plus LangSAM works somewhat well off-the-shelf, but struggles significantly with small objects and occlusion. I was able to improve results on some tasks by adding an L1 temporal consistency score on bounding boxes and a few data annotations. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. We are still looking for ways or newer models to improve results. Also, see the [Conclusion](#conclusion).
-
-<!-- Object state is an important property required for many robot planning methods. In simulation, this is readily available, but in the real world it must be measured or estimated. In our case, we were working on a data augmentation method that required object pose. I decided to use FoundationPose based on the recommendation of some of my colleagues. This was my first time using a pose tracking model, as they have recently only become good. Previously, I've used [AprilTags](https://april.eecs.umich.edu/software/apriltag) to track object poses. -->
-
+**TL;DR** FoundationPose combined with LangSAM works somewhat well out of the box, but struggles significantly with small objects and occlusions. I was able to improve results on some tasks by adding an L1 temporal-consistency score on bounding boxes and a few data annotations. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. We're still exploring newer models or other ways to improve results. Also, see the [Conclusion](#conclusion).
 
 # FoundationPose Overview
 
@@ -62,7 +59,7 @@ For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an 
 
 LangSAM is not a new method or architecture, but actually just code which combines the [Segment Anything](https://ai.meta.com/sam2/) (SAM) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM.
 
-SAM is a powerful segmentation model that can generate pixelwise segmentations for anything in an image (as the name implies). SAM takes an image and a prompt and outputs a segmentation mask. The prompt can either be points, a bounding box, or a text string. However, Meta has not released a version of SAM with text conditioning. Fortunately, this capability can be reproduced by adding Grounding DINO.
+SAM is a powerful segmentation model that can generate pixel-wise segmentations for anything in an image, as the name implies. SAM takes an image and a prompt and outputs a segmentation mask. The prompt can either be points, a bounding box, or a text string. However, Meta has not released a version of SAM with text conditioning. Fortunately, this capability can be reproduced by adding Grounding DINO.
 
 {{< figure src="sam_overview.png" title="An overview of the Segment Anything model (Source: https://arxiv.org/abs/2304.02643)" >}}
 {{< figure src="sam_examples.png" title="Example images segmented by SAM containing 400 to 500 masks per image (Source: https://arxiv.org/abs/2304.02643)" >}}
@@ -78,7 +75,7 @@ We have two reasons for using LangSAM:
 # Off-the-Shelf Performance
 FoundationPose requires RGBD video frames, a CAD model, camera intrinsics, and a binary segmentation mask of the tracked object in the first frame.
 
-Below is a visualization of our input video -- a VR-teleoperated demonstration of a block-stacking task.
+Below is a visualization of our input video of a VR-teleoperated demonstration of a block-stacking task.
 
 {{< youtube 8bc508QxUwo >}}
 
@@ -91,32 +88,11 @@ The cups, blocks, and plates we used for experiments were purchased on Amazon:
 - Blocks (painted after purchasing): https://a.co/d/i5k3pBq
 - Plates: https://a.co/d/6hOiS2a
 
-(These are not affiliate links; I'm not trying to sell anything. These are simply the objects that correspond to the CAD models I made.)
+(These are not affiliate links)
 
 The CAD models I created for each of them are available [here](https://github.com/jmcoholich/FoundationPose/tree/main/meshes).
 
 FoundationPose first requires an initial guess for object translation and rotation at every frame. The initial guess is then refined for a set number of iterations (default: 5) to produce the final estimate. For every frame except the first one, the pose estimate of the previous frame is used for initialization. When processing the first frame, FoundationPose generates 240 initial rotation guesses through sampling points and rotations on an [icosphere](https://en.wikipedia.org/wiki/Geodesic_polyhedron). The first-frame initial guess for translation is obtained through the user-provided segmentation mask. 
-
-<!-- For each frame of the video, FoundationPose requires an intial guess of the 6D object pose which is then iteratively refined. The FoundationPose code simply uses the final pose estimate from the previous frame as the initial guess, with the exception of the first frame. The initial guess for the first frame's object translation must be supplied by the user in the form of a segmentation mask. FoundationPose .  -->
-<!-- FoundationPose requires the segmentation mask to intilize the translation estimates for the first video frame. Here is the mask. After the first frame, the previous frame is used. Rotation estimates are initialized by randomly sampling a sphere then refining estimates.  -->
-<!-- ### First result
-
-{{< youtube Gs-hkQBOIac >}}
-This was my first try tracking just the blue cube on a 256x256 input. The tracking fails during manipulation and the model switches to the green cube instead. The cubes are both the exact same dimensions, so it makes sense that tracking might fail when they are near each other. -->
-
-<!--
-### Scene adjustments
-We changed our demo setup, increased resolution of cameras to  and moved cameras closer. Results were much better. Here is a visualization of our final setup.
-
-
-
-Below are the results running FoundationPose on three camera views cropped to 720x720. Its clear that higher resolution input and relatively larger objects helps. The tracking still fails in the third camera, which is farther from the table.
-{{< youtube hU97Uwc44Uc >}}
-
-
-The model does much better, but still fails on the third camera which is much farther away.
-
-Still fails on this: -->
 
 I modified the FoundationPose code to track all three cubes at once with a simple "for" loop. Below are the first results. I'm only running tracking on the front camera view.
 
@@ -131,7 +107,7 @@ My first idea for improving these results was to condition the pose estimates fo
 
 Watch the top right view. When the red cube is manipulated, LangSAM switches to segmenting the blue cube, then the green cube, and eventually the entire stack of cubes. Notably, all the segmentations in the first frame are correct, likely because none of the cubes are occluded by the gripper or stacked. 
 
-For each frame, Grounding DINO outputs multiple box proposals, thesholds them by bounding-box validity and text-alignment, then outputs the box with the highest text alignment score. Below is a visualization of the bounding box proposals and scores for the first frame for the prompt "red cube" (post thresholding). The highest scoring box is colored blue.
+For each frame, Grounding DINO outputs multiple bounding box proposals, filters them with bounding-box validity and text-alignment score threshold, then outputs the box with the highest text-alignment score. Below is a visualization of the filtered bounding box proposals and scores for the first frame for the prompt "red cube". The highest scoring box is colored blue.
 
 {{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
 
@@ -148,7 +124,7 @@ In Pytorch:
 dist_score = -torch.sum(torch.abs(bbox - last_bbox))
 </pre>
 
-We also lower the "box_threshold" and "text_threshold" from 0.3 and 0.25 to 0.1 and 0.1. This means Grounded DINO will output more bounding box proposals for us to select from.
+I also lowered the "box_threshold" and "text_threshold" from 0.3 and 0.25 to 0.1 and 0.1. This means Grounding DINO will output more bounding box proposals for us to select from.
 
 Here is the second frame, with the temporal consistency scores displayed:
 {{< figure src="temporal_consistency_scores.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO" >}}
@@ -166,13 +142,11 @@ Below are the FoundationPose results where every frame is conditioned on the imp
 
 Now, the model is able to track each block throughout the demo.
 
-You may also notice that the coordinate systems for each box are now aligned, in contrast to the first FoundationPose video. I realized that since cubes have many axes of symmetry, the icosphere of pose initializations leads to random output orientations. I reduced the number of initial rotation guesses to a single identity matrix which results in consistent cube pose estimates and a ~150% speedup of FoundationPose.
+You may also notice that the coordinate systems for each box are now aligned, in contrast to the first FoundationPose video. I realized that since cubes have many axes of symmetry, the icosphere of pose initializations leads to random output orientations. I reduced the number of initial rotation guesses to a single identity matrix which results in consistent cube orientations and a ~150% speedup of FoundationPose.
 
 # FoundationPose + Labels
 
-Occasionally, even the first-frame LangSAM segmentation is wrong, so temporal consistency can end up reinforcing an incorrect mask. Additionally, sometimes the objects are occluded completely or leave the image entirely, making tracking impossible. Since we were shooting for a deadline and needed results quickly, I decided to manually add some labels to our collection of 60 demonstrations. With the help of ChatGPT, I wrote a labeling pipeline to step through each video and provide labels for object bounding boxes and "stop tracking" at select frames. 
-
-<!-- Here are the segmentations for cups with labels. They results are the same, except now blah blah blah. -->
+Occasionally, even the first-frame LangSAM segmentation is wrong, so temporal consistency can end up reinforcing an incorrect mask. Additionally, sometimes objects are occluded completely or leave the image entirely, making tracking impossible. Since we were shooting for a deadline and needed results quickly, I decided to manually add some labels to our collection of 60 demonstrations. With the help of ChatGPT, I wrote a labeling pipeline to step through each video and provide object bounding box labels and "stop tracking" labels at select frames. 
 
 Here are the segmentations for the same stack-blocks demo again. Now, the Cam 0 "Franka robot arm" segmentation is correct, even in the first frame.
 
@@ -190,7 +164,7 @@ Tracking of the plates fails when they are lifted out of the scene or occlude ea
 Here are the results after adding temporal consistency and labels: 
 
 {{< youtube ilF_YeErRAM >}}
-The labels that tell FoundationPose when to stop and reinitialize tracking significantly improve the pose estimates.
+The labels that indicate when FoundationPose should top and reinitialize tracking significantly improve the pose estimates.
 
 
 <!-- And for the two other tasks:
@@ -203,24 +177,24 @@ Here is the before and after for the stack-cups task:
 {{< youtube 3QjOZKr2tlg >}}
 
 {{< youtube G7xddmpxsf4 >}}
-Much less of a difference is made, partially because the tracking already worked well without my modifications. I don't know why FoundationPose succeeded here and failed on the blocks, since the tasks are basically identical and use similarly-sized objects. Perhaps the FoundationPose training dataset contained more objects like the cups.
+There's much less of a difference, partially because the tracking already worked well without my modifications. I don't know why FoundationPose succeeded here and failed on the blocks, since the tasks are basically identical and use similarly-sized objects. Perhaps the FoundationPose training dataset contained more objects like the cups.
 
 # Conclusion
-We're still looking for better solutions for real-world object pose estimation! Conditioning FoundationPose on temporally consistent bounding boxes greatly improved results for the stack-blocks task, while data annotations greatly improved results for the stack-plates task. However, the results are still far from perfect and manually providing data annotations videos tracking multiple objects is not scalable. For those who are interested in going down the same path, here are some recommendations:
+We're still looking for better solutions for real-world object pose estimation. Conditioning FoundationPose on temporally consistent bounding boxes greatly improved results for the stack-blocks task, while data annotations greatly improved results for the stack-plates task. However, the results are still far from perfect and manually providing data annotations for videos for multiple objects is not scalable. For those who are interested in also using FoundationPose, here are some recommendations:
 
 ### My Recommendations
 
-For real-world object pose tracking, the best thing to use is a motion capture system. The second best thing would be to use several [AprilTags](https://april.eecs.umich.edu/software/apriltag) on each object. If that's not an option either, use FoundationPose or BundleSDF. To obtain decent results with these models: 
+For real-world object pose tracking, the best thing to use is a motion capture system. If that is not an option, I would recommend putting several [AprilTags](https://april.eecs.umich.edu/software/apriltag) on each object and tracking them that way. If neither of those options work, then use FoundationPose. To obtain decent results with these models: 
 - Track large objects or move the cameras closer to the scene
 - Use the highest camera resolution
 - Avoid occluding the tracked objects
 - Avoid moving the tracked objects out of frame
 - If you have a higher compute budget, try [BundleSDF](https://bundlesdf.github.io/). BundleSDF takes longer to run for each video, but handles occlusions much better.
 
-For the LangSAM language-to-segmentation pipeline, I recommend:
-- Choosing objects that are distinct from other objects in the scene in terms of shape and color
-- Spending time experimenting with different prompts
-- Using an LLM to generate prompts to try
+My recommendations regarding LangSAM are to:
+- Choose objects that are distinct from other objects in the scene in terms of shape and color
+- Spend time experimenting with different prompts
+- Use an LLM to generate prompts to try
 - Use bounding box prompting for SAM (instead of points)
 
 Here is my Fork of FoundationPose: https://github.com/jmcoholich/FoundationPose.

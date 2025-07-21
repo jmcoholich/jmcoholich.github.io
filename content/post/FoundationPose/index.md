@@ -51,9 +51,7 @@ FoundationPose operates either in a model-based or model-free mode, where "model
 
 For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an in-depth understanding of FoundationPose is not required to use the model. Below is an overview of their method (Figure 2 from the paper).
 
-<!-- ![FoundationPose Figure 2](FounationPose_Fig2.jpg) -->
-
-{{< figure src="FounationPose_Fig2.jpg" title="FoundationPose method overview (Source: https://nvlabs.github.io/FoundationPose/)" >}}
+{{< figure src="FoundationPose_Fig2.jpg" title="FoundationPose method overview (Source: https://nvlabs.github.io/FoundationPose/)" >}}
 
 # LangSAM Overview
 
@@ -109,7 +107,7 @@ Watch the top right view. When the red cube is manipulated, LangSAM switches to 
 
 For each frame, Grounding DINO outputs multiple bounding box proposals, filters them with bounding-box validity and text-alignment score threshold, then outputs the box with the highest text-alignment score. Below is a visualization of the filtered bounding box proposals and scores for the first frame for the prompt "red cube". The highest scoring box is colored blue.
 
-{{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals  and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
+{{< figure src="GDINO_alignment_scores.jpg" title="Bounding box proposals and alignment scores for prompt \"red cube\" from Grounding DINO" >}}
 
 I implemented a new scoring function to enforce bounding-box consistency between frames. This scoring function (below) is used instead of the prompt-alignment score for all frames except for the first one. 
 
@@ -164,7 +162,7 @@ Tracking of the plates fails when they are lifted out of the scene or occlude ea
 Here are the results after adding temporal consistency and labels: 
 
 {{< youtube ilF_YeErRAM >}}
-The labels that indicate when FoundationPose should top and reinitialize tracking significantly improve the pose estimates.
+The labels that indicate when FoundationPose should stop and reinitialize tracking significantly improve the pose estimates.
 
 
 <!-- And for the two other tasks:

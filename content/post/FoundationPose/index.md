@@ -1,9 +1,9 @@
 ---
-title: FoundationPose for Robotics
-subtitle: My experience running FoundationPose and LangSAM for monocular RGBD object pose tracking in a tabletop maniulation setting
+title: FoundationPose and LangSAM for Robotics
+subtitle: My experience running FoundationPose and LangSAM for monocular RGBD object pose tracking in a tabletop manipulation setting
 
 # Summary for listings and search engines
-summary: We combine three foundation models -- SAM, Grounded DINO, and FoundationPose -- for the purpose of running pose estimation on raw RGBD robot demonstrations. In order to improve results, we add a temporal consistency scoring function and various annotations to the data. Ultimately, the results are mixed and perhaps not good enough to provide object states to downstream robot planners.
+summary: We combine three foundation models -- SAM, Grounded DINO, and FoundationPose -- for the purpose of running pose estimation on raw RGBD robot demonstrations. In order to improve results, we add a temporal consistency scoring function and various annotations to the data. Ultimately, the results are mixed and we are looking for ways to improve them further.
 # Link this post with a project
 projects: []
 
@@ -39,9 +39,9 @@ authors:
 # categories:
 #   - Demo
 ---
-This blog post is about my experience using [FoundationPose](https://nvlabs.github.io/FoundationPose/) with [LangSAM](https://github.com/luca-medeiros/lang-segment-anything). It is meant to provide advice for others and third-party results for reference.
+This blog post is about my experience using [FoundationPose](https://nvlabs.github.io/FoundationPose/) with [LangSAM](https://github.com/luca-medeiros/lang-segment-anything). It is meant to provide advice for others and qualitative third-party results for reference.
 
-**TLDR;** FoundationPose is generally not good enough to provide ground-truth object poses for real-world robot manipulation tasks. The model works somewhat off-the-shelf, but struggles significantly with small objects and occlusion. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. Also, see the [Conclusion](#conclusion).
+**TLDR;** FoundationPose plus LangSAM works somewhat well off-the-shelf, but struggles significantly with small objects and occlusion. I was able to greatly improve results on some tasks by adding a temporal consistency score and some manual annotations to the data. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. We are still looking for ways to improve results (including switching to different pose estimation models). We only provide qualitative results videos for comparision, since we don't have ground-truth object states in the real world to compare against. Also, see the [Conclusion](#conclusion).
 
 <!-- Object state is an important property required for many robot planning methods. In simulation, this is readily available, but in the real world it must be measured or estimated. In our case, we were working on a data augmentation method that required object pose. I decided to use FoundationPose based on the recommendation of some of my colleagues. This was my first time using a pose tracking model, as they have recently only become good. Previously, I've used [AprilTags](https://april.eecs.umich.edu/software/apriltag) to track object poses. -->
 
@@ -62,7 +62,7 @@ For more details, see the [paper](https://arxiv.org/abs/2312.08344), however an 
 
 LangSAM is not a new method or architecture, but actually just code which combines the [Segment Anything](https://ai.meta.com/sam2/) (SAM) model from Meta with the [Grounding DINO](https://arxiv.org/abs/2303.05499) open-world object detector. Here, an understanding of what is really going on is helpful for effectively using and modifying LangSAM.
 
-SAM is a powerful segmentation model that can generate pixelwise segmentations for anything in an image (as the name implies). SAM takes an image and a prompt and outputs a segmentation mask. The prompt can either be points, a bounding box, or a text string. However, Meta has not released a version of SAM with text conditioning. Fortunately, this capabitily can be reproduced by adding Grounding DINO.
+SAM is a powerful segmentation model that can generate pixelwise segmentations for anything in an image (as the name implies). SAM takes an image and a prompt and outputs a segmentation mask. The prompt can either be points, a bounding box, or a text string. However, Meta has not released a version of SAM with text conditioning. Fortunately, this capability can be reproduced by adding Grounding DINO.
 
 {{< figure src="sam_overview.png" title="An overview of the Segment Anything model (Source: https://arxiv.org/abs/2304.02643)" >}}
 {{< figure src="sam_examples.png" title="Example images segmented by SAM containing 400 to 500 masks per image (Source: https://arxiv.org/abs/2304.02643)" >}}
@@ -156,7 +156,7 @@ Here is the second frame, with the temporal consistency scores displayed:
 Here is another example from the side camera view (145th frame):
 {{< figure src="temporal_consistency_scores_2.jpg" title="Bounding box proposals and temporal consistency scores for prompt \"red cube\" from Grounding DINO, with many bounding box proposals" >}}
 
-Below is are the segmentations for the same demo obtained with the temporal-consistency scoring function.
+Below are the segmentations for the same demo obtained with the temporal-consistency scoring function.
 {{< youtube i0zaNuNY9RM >}}
 Clearly, the tracking is much better now. Watching the top right view again and observe that the red block is segmented correctly the entire video, even during manipulation and stacking. However, there are still some small errors. For example, for cam 0 "Franka robot arm", the block is segmented instead of the robot (the tip of the gripper). This will be addressed in the next section.
 
@@ -174,7 +174,7 @@ Occasionally, LangSAM segmentations are wrong even for the first frame, meaning 
 
 <!-- Here are the segmentations for cups with labels. They results are the same, except now blah blah blah. -->
 
-Here are the segemtations for the same stack-blocks demo again. Now, the cam 0 "Franka robot arm" segmentation is correct, even in the first frame.
+Here are the segmentations for the same stack-blocks demo again. Now, the cam 0 "Franka robot arm" segmentation is correct, even in the first frame.
 
 {{< youtube TDYzbGJ2REg >}}
 
@@ -206,9 +206,9 @@ Here is the before and after for the stack-cups task.
 Much less of a difference is made here, partially because the tracking worked well off-the-shelf, for some reason. I don't know why the model succeeded here and failed on the cubes, since both tasks are quite similar and use similarly-sized objects. Perhaps FoundationPose training dataset contained more objects like the cups.
 
 # Conclusion
-Temporal consistency scoring greatly improved results for the stack-blocks task, while data annotations greatly improved results for the stack-plates task. However, the results are still far from perfrect and providing high-quality annotations for demo videos tracking multiple objects is not scalable.
+Temporal consistency scoring greatly improved results for the stack-blocks task, while data annotations greatly improved results for the stack-plates task. However, the results are still far from perfect and providing high-quality annotations for demo videos tracking multiple objects is not scalable.
 
-For now, we've stopped using FoundationPose and are looking for other solutions. I talked to two other PhD students working on manipulation who had also tried to use FoundationPose and abandoned it, saying my video results were better than theirs even. However, for those interested in trying, here are some recommendations.
+We are still looking for solutions for real world object pose estimation. I talked to two other PhD students working on manipulation who had also tried to use FoundationPose and abandoned it, saying my video results were better than theirs even. For those who are interested in going down the same path, here are some recommendations:
 
 ### My Recommendations
 

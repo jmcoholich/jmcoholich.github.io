@@ -72,17 +72,13 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-**Update**: I am currently looking for a Summer/Fall internship related to robotics and Vision-Language-Action (VLA) models.
+**Update**: I am currently looking for a Fall 2025 internship related to Vision-Language-Action (VLA) models, robot data augmentation, or reinforcement learning. 
  Here is my {{< staticref "uploads/Resume_Spring_2025.pdf" "newtab" >}}resumé{{< /staticref >}}.
 <!-- {{< icon name="download" pack="fas" >}} -->
 
-I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira). My current research thrust involves using computer vision techniques for robot learning.
+I am a [Robotics PhD](https://research.gatech.edu/robotics/phd-program-robotics) student at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/), advised by [Dr. Zsolt Kira](https://www.cc.gatech.edu/people/zsolt-kira), working on robot learning (imitation learning and reinforcement learning). I plan to graduate from my PhD in the Summer of 2026. My dissertation will be on robot data augmentation. 
 
-In the summer of 2023 I was an intern at [Honda Research Institute](https://usa.honda-ri.com/) working on deep learning-based dexterous manipulation under [Jinda Cui](https://www.jindacui.net/) and [Soshi Iba](https://www.linkedin.com/in/soshi-iba-7090467/).
-
-During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I had the pleasure of working with [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/).
-
-I also enjoy hiking, running, and rock climbing.
+In the summer of 2023 I was an intern at [Honda Research Institute](https://usa.honda-ri.com/) working on deep learning-based dexterous manipulation under [Jinda Cui](https://www.jindacui.net/) and [Soshi Iba](https://www.linkedin.com/in/soshi-iba-7090467/). During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I was mentored by [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/). Currently, I have the pleasure of mentoring two masters students, [Justin Wit](https://www.linkedin.com/in/justin-wit/) and [Thuan Nguyen](https://www.linkedin.com/in/thuantnguyen/). In my free time, I enjoy hiking, running, rock climbing, yoga, and surfing.
 
 Check out the new VR teleoperated setup I put together:
 

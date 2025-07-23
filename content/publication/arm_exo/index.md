@@ -67,6 +67,9 @@ featured: true
 # links:
 # - name: Custom Link
 #   url: http://example.org
+links:
+- name: arXiv
+  url: "https://arxiv.org/pdf/1903.09673"
 
 url_pdf: ''
 url_code: ''

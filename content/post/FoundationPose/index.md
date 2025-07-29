@@ -43,6 +43,13 @@ This blog post is about my experience using [FoundationPose](https://nvlabs.gith
 
 **TL;DR** FoundationPose combined with LangSAM works somewhat well out of the box, but struggles significantly with small objects and occlusions. I was able to improve results on some tasks by adding an L1 temporal-consistency score on bounding boxes and a few manual data annotations. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. We're still exploring newer models and other ways to improve results. Also, see the [Conclusion](#conclusion).
 
+[Jump to Results on Stack-Blocks](#stack-blocks-with-temporal-consistency)
+
+[Jump to Results on Stack-Plates](#stack-plates-results)
+
+[Jump to Results on Stack-Cups](#stack-cups-results)
+
+
 # FoundationPose Overview
 
 FoundationPose is a 6D object pose estimation model. It is trained on synthetically-augmented [Objaverse](https://objaverse.allenai.org/) objects. At inference time, the model generates multiple pose hypotheses, ranks them, and outputs the rank 0 pose estimate. Unlike previous works, FoundationPose does not need to build a NeRF of the object first.
@@ -136,7 +143,15 @@ Clearly, the tracking is much better now. Observe that the red block in Cam 0 (t
 
 Below are the FoundationPose results where every frame is conditioned on the improved, temporally-consistency segmentations from LangSAM.
 
-{{< youtube NemeM3IC1gU >}}
+#### Stack-Blocks with Temporal Consistency
+<figure>
+  {{< youtube NemeM3IC1gU >}}
+  <figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+    FoundationPose tracking three blocks. I applied an L1-consistency score to the blocks' bounding boxes from Grounding DINO, used those boxes to prompt SAM, then conditioned FoundationPose on the resulting segmentation masks at every frame. I also gave the blocks a canonical orientation.
+  </figcaption>
+</figure>
+
+[Jump to top](#)
 
 Now, the model is able to track each block throughout the demo.
 
@@ -161,7 +176,16 @@ Tracking of the plates fails when they are lifted out of the scene or occlude ea
 
 Here are the results after adding temporal consistency and labels:
 
-{{< youtube ilF_YeErRAM >}}
+#### Stack-Plates Results
+<figure>
+  {{< youtube ilF_YeErRAM >}}
+  <figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+    FoundationPose on Stack-Plates. This task is especially difficult due to occlusions and plates going out-of-frame. I added annotations to each video specifying when FoundationPose should stop and reinitialize tracking for each object, which greatly improves performance. Tracking is reinitialized from temporally consistent masks from LangSAM.
+  </figcaption>
+</figure>
+
+[Jump to top](#)
+
 The labels that indicate when FoundationPose should stop and reinitialize tracking significantly improve the pose estimates.
 
 
@@ -174,7 +198,16 @@ Stack plates:
 Here is the before and after for the stack-cups task:
 {{< youtube 3QjOZKr2tlg >}}
 
-{{< youtube G7xddmpxsf4 >}}
+#### Stack-Cups Results
+<figure>
+  {{< youtube G7xddmpxsf4 >}}
+  <figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+    FoundationPose on Stack-Cups. Even with some manual video annotations and temporally-consistent segmentation masks, tracking still partially fails at the end when the cups are stacked. Occlusion seems to be a common failure mode for FoundationPose.
+  </figcaption>
+</figure>
+
+[Jump to top](#)
+
 There's much less of a difference, partially because the tracking already worked well without my modifications. I don't know why FoundationPose succeeded here and failed on the blocks, since the tasks are basically identical and use similarly-sized objects. Perhaps the FoundationPose training dataset contained more objects like the cups.
 
 # Conclusion
@@ -201,6 +234,8 @@ Here are more tips for running FoundationPose from the authors: https://github.c
 https://github.com/030422Lee/FoundationPose_manual
 
 A huge thanks to the FoundationPose authors for developing and releasing this model! Also thank you to [Justin Wit](https://www.linkedin.com/in/justin-wit/) for helping me setup tasks and collect data for all the experiments shown.
+
+[Jump to top](#)
 
 ## References
 <div style="font-size: 12px">

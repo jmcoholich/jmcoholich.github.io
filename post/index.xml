@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts | Jeremiah Coholich</title><link>https://jmcoholich.github.io/post/</link><atom:link href="https://jmcoholich.github.io/post/index.xml" rel="self" type="application/rss+xml"/><description>Posts</description><generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Sun, 29 Jun 2025 00:00:00 +0000</lastBuildDate><image><url>https://jmcoholich.github.io/media/icon_huc310f1ac1642ff51805cd109dc789c7d_32737_512x512_fill_lanczos_center_3.png</url><title>Posts</title><link>https://jmcoholich.github.io/post/</link></image><item><title>FoundationPose and LangSAM for Robotics</title><link>https://jmcoholich.github.io/post/foundationpose/</link><pubDate>Sun, 29 Jun 2025 00:00:00 +0000</pubDate><guid>https://jmcoholich.github.io/post/foundationpose/</guid><description>&lt;p>This blog post is about my experience using &lt;a href="https://nvlabs.github.io/FoundationPose/" target="_blank" rel="noopener">FoundationPose&lt;/a> with &lt;a href="https://github.com/luca-medeiros/lang-segment-anything" target="_blank" rel="noopener">LangSAM&lt;/a>. It is meant to provide advice for others and qualitative third-party results for reference.&lt;/p>
 &lt;p>&lt;strong>TL;DR&lt;/strong> FoundationPose combined with LangSAM works somewhat well out of the box, but struggles significantly with small objects and occlusions. I was able to improve results on some tasks by adding an L1 temporal-consistency score on bounding boxes and a few manual data annotations. The model/code has no built-in way of dealing with objects going out-of-frame or complete occlusion, which is a big practical limitation. We&amp;rsquo;re still exploring newer models and other ways to improve results. Also, see the &lt;a href="#conclusion">Conclusion&lt;/a>.&lt;/p>
+&lt;p>&lt;a href="#stack-blocks-with-temporal-consistency">Jump to Results on Stack-Blocks&lt;/a>&lt;/p>
+&lt;p>&lt;a href="#stack-plates-results">Jump to Results on Stack-Plates&lt;/a>&lt;/p>
+&lt;p>&lt;a href="#stack-cups-results">Jump to Results on Stack-Cups&lt;/a>&lt;/p>
 &lt;h1 id="foundationpose-overview">FoundationPose Overview&lt;/h1>
 &lt;p>FoundationPose is a 6D object pose estimation model. It is trained on synthetically-augmented &lt;a href="https://objaverse.allenai.org/" target="_blank" rel="noopener">Objaverse&lt;/a> objects. At inference time, the model generates multiple pose hypotheses, ranks them, and outputs the rank 0 pose estimate. Unlike previous works, FoundationPose does not need to build a NeRF of the object first.&lt;/p>
 &lt;p>FoundationPose operates either in a model-based or model-free mode, where &amp;ldquo;model&amp;rdquo; refers to a 3D mesh of the tracked object. To run FoundationPose model-free, several reference images of the object need to be supplied. I&amp;rsquo;ve only tried the model-based version of FoundationPose.&lt;/p>
@@ -139,9 +142,16 @@ Bounding box proposals and temporal consistency scores for prompt &amp;ldquo;red
 &lt;/div>
 Clearly, the tracking is much better now. Observe that the red block in Cam 0 (top right) is now segmented correctly even during manipulation and stacking. However, there are still some small errors. For example, at the start in the Cam 0 &amp;ldquo;Franka robot arm&amp;rdquo; view, the green block is segmented instead of the robot. This will be addressed in the next section with the addition of labels.&lt;/p>
 &lt;p>Below are the FoundationPose results where every frame is conditioned on the improved, temporally-consistency segmentations from LangSAM.&lt;/p>
+&lt;h4 id="stack-blocks-with-temporal-consistency">Stack-Blocks with Temporal Consistency&lt;/h4>
+&lt;figure>
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/NemeM3IC1gU" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
+&lt;figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+FoundationPose tracking three blocks. I applied an L1-consistency score to the blocks' bounding boxes from Grounding DINO, used those boxes to prompt SAM, then conditioned FoundationPose on the resulting segmentation masks at every frame. I also gave the blocks a canonical orientation.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>&lt;a href="#">Jump to top&lt;/a>&lt;/p>
 &lt;p>Now, the model is able to track each block throughout the demo.&lt;/p>
 &lt;p>You may also notice that the coordinate systems for each box are now aligned, in contrast to the first FoundationPose video. I realized that since cubes have many axes of symmetry, the icosphere of pose initializations leads to random output orientations. I reduced the number of initial rotation guesses to a single identity matrix which results in consistent cube orientations and a ~150% speedup of FoundationPose.&lt;/p>
 &lt;h1 id="foundationpose--labels">FoundationPose + Labels&lt;/h1>
@@ -159,11 +169,17 @@ Clearly, the tracking is much better now. Observe that the red block in Cam 0 (t
 &lt;/div>
 Tracking of the plates fails when they are lifted out of the scene or occlude each other on the rack.&lt;/p>
 &lt;p>Here are the results after adding temporal consistency and labels:&lt;/p>
-&lt;p>
+&lt;h4 id="stack-plates-results">Stack-Plates Results&lt;/h4>
+&lt;figure>
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/ilF_YeErRAM" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
-The labels that indicate when FoundationPose should stop and reinitialize tracking significantly improve the pose estimates.&lt;/p>
+&lt;figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+FoundationPose on Stack-Plates. This task is especially difficult due to occlusions and plates going out-of-frame. I added annotations to each video specifying when FoundationPose should stop and reinitialize tracking for each object, which greatly improves performance. Tracking is reinitialized from temporally consistent masks from LangSAM.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>&lt;a href="#">Jump to top&lt;/a>&lt;/p>
+&lt;p>The labels that indicate when FoundationPose should stop and reinitialize tracking significantly improve the pose estimates.&lt;/p>
 &lt;!-- And for the two other tasks:
 Stack cups:
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
@@ -179,11 +195,17 @@ Stack plates:
 &lt;iframe src="https://www.youtube.com/embed/3QjOZKr2tlg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
 &lt;/p>
-&lt;p>
+&lt;h4 id="stack-cups-results">Stack-Cups Results&lt;/h4>
+&lt;figure>
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/G7xddmpxsf4" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
-There&amp;rsquo;s much less of a difference, partially because the tracking already worked well without my modifications. I don&amp;rsquo;t know why FoundationPose succeeded here and failed on the blocks, since the tasks are basically identical and use similarly-sized objects. Perhaps the FoundationPose training dataset contained more objects like the cups.&lt;/p>
+&lt;figcaption style="text-align: center; font-style: italic; margin-top: 0.5em;">
+FoundationPose on Stack-Cups. Even with some manual video annotations and temporally-consistent segmentation masks, tracking still partially fails at the end when the cups are stacked. Occlusion seems to be a common failure mode for FoundationPose.
+&lt;/figcaption>
+&lt;/figure>
+&lt;p>&lt;a href="#">Jump to top&lt;/a>&lt;/p>
+&lt;p>There&amp;rsquo;s much less of a difference, partially because the tracking already worked well without my modifications. I don&amp;rsquo;t know why FoundationPose succeeded here and failed on the blocks, since the tasks are basically identical and use similarly-sized objects. Perhaps the FoundationPose training dataset contained more objects like the cups.&lt;/p>
 &lt;h1 id="conclusion">Conclusion&lt;/h1>
 &lt;p>We&amp;rsquo;re still looking for better solutions for real-world object pose estimation. Conditioning FoundationPose on temporally consistent bounding boxes greatly improved results for the stack-blocks task, while data annotations greatly improved results for the stack-plates task. However, the results are still far from perfect and manually providing data annotations for videos for multiple objects is not scalable. For those who are also interested in also using FoundationPose, here are some recommendations:&lt;/p>
 &lt;h3 id="my-recommendations">My Recommendations&lt;/h3>
@@ -206,6 +228,7 @@ There&amp;rsquo;s much less of a difference, partially because the tracking alre
 &lt;p>Here are more tips for running FoundationPose from the authors: &lt;a href="https://github.com/NVlabs/FoundationPose/issues/44#issuecomment-2048141043" target="_blank" rel="noopener">https://github.com/NVlabs/FoundationPose/issues/44#issuecomment-2048141043&lt;/a>
 &lt;a href="https://github.com/030422Lee/FoundationPose_manual" target="_blank" rel="noopener">https://github.com/030422Lee/FoundationPose_manual&lt;/a>&lt;/p>
 &lt;p>A huge thanks to the FoundationPose authors for developing and releasing this model! Also thank you to &lt;a href="https://www.linkedin.com/in/justin-wit/" target="_blank" rel="noopener">Justin Wit&lt;/a> for helping me setup tasks and collect data for all the experiments shown.&lt;/p>
+&lt;p>&lt;a href="#">Jump to top&lt;/a>&lt;/p>
 &lt;h2 id="references">References&lt;/h2>
 &lt;div style="font-size: 12px">
 &lt;blockquote style="margin: 0.3em 0;">

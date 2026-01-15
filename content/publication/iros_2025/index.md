@@ -7,6 +7,7 @@ title: 'Sim2real Image Translation Enables ViewpointRobust Policies from Fixed-C
 authors:
   - Jeremiah Coholich
   - Justin Wit
+  - Robert Azarcon
   - Zsolt Kira
 
 # # Author notes (optional)
@@ -30,27 +31,10 @@ publication_types: ['1']
 publication:
 publication_short:
 
-abstract: "Vision-based policies for robot manipulation have
-achieved significant recent success, but are still brittle to
-distribution shifts such as camera viewpoint variations. One
-reason is that robot demonstration data used to train such
-policies often lacks appropriate variation in camera viewpoints.
-Simulation offers a way to collect robot demonstrations at
-scale with comprehensive coverage of different viewpoints, but
-presents a visual sim2real challenge. To bridge this gap, we
-propose an unpaired image translation method with a novel
-segmentation-conditioned InfoNCE loss, a highly-regularized
-discriminator design, and a modified PatchNCE loss. We find
-that these elements are crucial for maintaining viewpoint
-consistency during translation. For image translator training,
-we use only real-world robot play data from a single fixed
-camera but show that our method can generate diverse unseen
-viewpoints. We observe up to a 46% absolute improvement
-in manipulation success rates under viewpoint shift when we
-augment real data with our sim2real translated data."
+abstract: "Vision-based policies for robot manipulation have achieved significant recent success, but are still brittle to distribution shifts such as camera viewpoint variations. Robot demonstration data is scarce and often lacks appropriate variation in camera viewpoints. Simulation offers a way to collect robot demonstrations at scale with comprehensive coverage of different viewpoints, but presents a visual sim2real challenge. To bridge this gap, we propose MANGO -- an unpaired image translation method with a novel segmentation-conditioned InfoNCE loss, a highly-regularized discriminator design, and a modified PatchNCE loss. We find that these elements are crucial for maintaining viewpoint consistency during sim2real translation. When training MANGO, we only require a small amount of fixed-camera data from the real world, but show that our method can generate diverse unseen viewpoints by translating simulated observations. In this domain, MANGO outperforms all other image translation methods we tested. Imitation-learning policies trained on data augmented by MANGO are able to achieve success rates as high as 60% on views that the non-augmented policy fails completely on."
 
 # Summary. An optional shortened abstract.
-summary: Submitted to 2025 International Conference on Intelligent Robots and Systems (IROS)
+summary: Submitted to 2026 International Conference on Robotics and Automation (ICRA)
 tags: ['published']
 
 # Display this page in the Featured widget?
@@ -62,6 +46,8 @@ links:
   url: "https://embodied-ai.org/cvpr2025/"
 - name: Workshop Version PDF
   url: "CVPR_EAI_Workshop_2025.pdf"
+- name: arXiv
+  url: "https://arxiv.org/abs/2601.09605"
 
 url_pdf: ''
 url_code: ''
@@ -70,7 +56,7 @@ url_poster: ''
 url_project: 'https://sites.google.com/view/sim2real-viewpoints'
 url_slides: ''
 url_source: ''
-url_video: 'https://youtu.be/9iI0VzXBZn0?si=PtYQPP1VsEvaSBIj'
+url_video: 'https://www.youtube.com/watch?v=TpJAVsl97SA'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

@@ -31,7 +31,7 @@ publication_types: ['1']
 publication:
 publication_short:
 
-abstract: "Vision-based policies for robot manipulation have achieved significant recent success, but are still brittle to distribution shifts such as camera viewpoint variations. Robot demonstration data is scarce and often lacks appropriate variation in camera viewpoints. Simulation offers a way to collect robot demonstrations at scale with comprehensive coverage of different viewpoints, but presents a visual sim2real challenge. To bridge this gap, we propose MANGO -- an unpaired image translation method with a novel segmentation-conditioned InfoNCE loss, a highly-regularized discriminator design, and a modified PatchNCE loss. We find that these elements are crucial for maintaining viewpoint consistency during sim2real translation. When training MANGO, we only require a small amount of fixed-camera data from the real world, but show that our method can generate diverse unseen viewpoints by translating simulated observations. In this domain, MANGO outperforms all other image translation methods we tested. Imitation-learning policies trained on data augmented by MANGO are able to achieve success rates as high as 60% on views that the non-augmented policy fails completely on."
+abstract: "Vision-based policies for robot manipulation have achieved significant recent success, but are still brittle to distribution shifts such as camera viewpoint variations. Robot demonstration data is scarce and often lacks appropriate variation in camera viewpoints. Simulation offers a way to collect robot demonstrations at scale with comprehensive coverage of different viewpoints, but presents a visual sim2real challenge. To bridge this gap, we propose MANGO -- an unpaired image translation method with a novel segmentation-conditioned InfoNCE loss, a highly-regularized discriminator design, and a modified PatchNCE loss. We find that these elements are crucial for maintaining viewpoint consistency during sim2real translation. When training MANGO, we only require a small amount of fixed-camera data from the real world, but show that our method can generate diverse unseen viewpoints by translating simulated observations. In this setting, MANGO outperforms all other image translation methods we tested. In certain real-world tabletop manipulation tasks, MANGO augmentation increases shifted-view success rates by over 40 percentage points compared to policies trained without augmentation."
 
 # Summary. An optional shortened abstract.
 summary: 2026 International Conference on Robotics and Automation (ICRA)
@@ -42,17 +42,23 @@ featured: true
 
 # Custom links (uncomment lines below)
 links:
+- name: Project Page
+  url: "https://www.jeremiahcoholich.com/mango"
+- name: Code
+  url: "https://github.com/jmcoholich/mango-release"
+- name: Dataset
+  url: "https://huggingface.co/datasets/jcoholich/mango_data"
 - name: arXiv
   url: "https://arxiv.org/abs/2601.09605"
 
 url_pdf: ''
+url_project: ''
 url_code: ''
 url_dataset: ''
 url_poster: ''
-url_project: 'https://www.jeremiahcoholich.com/mango/'
 url_slides: ''
 url_source: ''
-url_video: 'https://www.youtube.com/watch?v=TpJAVsl97SA'
+# url_video: 'https://www.youtube.com/watch?v=TpJAVsl97SA'
 
 # Featured image
 # To use, add an image named `featured.jpg/png` to your page's folder.

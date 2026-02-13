@@ -1,0 +1,10 @@
+// Ensure Cite button renders last when present.
+.btn-links {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.btn-links .js-cite-modal {
+  order: 999;
+}

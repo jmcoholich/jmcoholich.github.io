@@ -8,3 +8,21 @@
 .btn-links .js-cite-modal {
   order: 999;
 }
+
+// Larger thumbnails on the homepage publication and blog sections.
+#publications .media.stream-item img,
+#unpublished .media.stream-item img,
+#posts .media.stream-item img {
+  width: 220px;
+  max-width: 220px;
+  height: auto;
+}
+
+@media screen and (max-width: 768px) {
+  #publications .media.stream-item img,
+  #unpublished .media.stream-item img,
+  #posts .media.stream-item img {
+    width: 140px;
+    max-width: 140px;
+  }
+}

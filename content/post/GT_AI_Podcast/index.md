@@ -1,9 +1,9 @@
 ---
 title: I appeared on the Georgia Tech AI Podcast
-subtitle: I appeared on the Georgia Tech AI Podcast
+subtitle:
 
 # Summary for listings and search engines
-summary: I appeared on the Georgia Tech AI Podcast
+summary:
 # Link this post with a project
 projects: []
 

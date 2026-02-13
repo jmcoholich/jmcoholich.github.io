@@ -80,9 +80,8 @@ I am a Robotics PhD student at Georgia Tech in the [Robotics Perception and Lear
 
 In the summer of 2023 I was an intern at [Honda Research Institute](https://usa.honda-ri.com/) working on deep learning-based dexterous manipulation under [Jinda Cui](https://www.jindacui.net/) and [Soshi Iba](https://www.linkedin.com/in/soshi-iba-7090467/). During my bachelor's degree, I was an undergraduate research assistant in the [Human Centered Robotics Lab](https://sites.utexas.edu/hcrl/) where I was mentored by [Dr. Luis Sentis](https://www.ae.utexas.edu/people/faculty/faculty-directory/sentis) and [Dr. Gray Thomas](https://graythomas.github.io/). I spent my summers interning at [SpaceX](https://www.spacex.com/), [Harmonic Bionics](https://www.harmonicbionics.com/), and [NASA JPL](https://www.jpl.nasa.gov/). Additionally, I spent a large amount of time co-founding and leading [Longhorn Racing Electric](https://www.longhornracing.org/). During my PhD, I've the pleasure of mentoring two masters students, [Justin Wit](https://www.linkedin.com/in/justin-wit/) and [Robert Azarcon](https://www.linkedin.com/in/rbazarcon/).
 
-Check out the new VR teleoperated setup I put together:
+Check out the new VR teleoperated setup I put together! [Code](https://github.com/jmcoholich/openteach)
 
-<!-- {{< youtube 0uvbwTsbUGk >}} -->
 <div style="max-width: 600px;">
   {{< youtube 0uvbwTsbUGk >}}
 </div>

@@ -9,20 +9,51 @@
   order: 999;
 }
 
-// Larger thumbnails on the homepage publication and blog sections.
+// Custom social icon support for entries using `icon_pack: custom`.
+i.custom[class^="custom-"],
+i.custom[class*=" custom-"] {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+i.custom.custom-huggingface {
+  mask-image: url("/media/icons/huggingface.svg");
+  -webkit-mask-image: url("/media/icons/huggingface.svg");
+}
+
+// Larger thumbnails on the homepage publication sections.
 #publications .media.stream-item img,
-#unpublished .media.stream-item img,
+#unpublished .media.stream-item img {
+  width: 264px;
+  max-width: 264px;
+  height: auto;
+}
+
+// Match blog post thumbnails to the larger publication thumbnail sizing.
 #posts .media.stream-item img {
-  width: 220px;
-  max-width: 220px;
+  width: 264px;
+  max-width: 264px;
   height: auto;
 }
 
 @media screen and (max-width: 768px) {
   #publications .media.stream-item img,
-  #unpublished .media.stream-item img,
+  #unpublished .media.stream-item img {
+    width: 168px;
+    max-width: 168px;
+  }
+
   #posts .media.stream-item img {
-    width: 140px;
-    max-width: 140px;
+    width: 168px;
+    max-width: 168px;
   }
 }

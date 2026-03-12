@@ -55,6 +55,9 @@ social:
   - icon: github
     icon_pack: fab
     link: https://github.com/jmcoholich
+  - icon: huggingface
+    icon_pack: custom
+    link: https://huggingface.co/jcoholich
   - icon: linkedin
     icon_pack: fab
     link: https://www.linkedin.com/in/jeremiah-coholich/

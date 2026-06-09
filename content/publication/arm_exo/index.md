@@ -6,7 +6,7 @@ title: 'Compliance Shaping for Control of Strength Amplification Exoskeletons wi
 # and it will be replaced with their full name and linked to their profile.
 authors:
   - Gray Cortright Thomas
-  - Jeremiah M Coholich
+  - admin
   - Luis Sentis
 # # Author notes (optional)
 # author_notes:

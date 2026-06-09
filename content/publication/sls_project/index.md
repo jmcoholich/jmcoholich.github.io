@@ -6,7 +6,7 @@ title: 'Evaluation of energy density measures and validation for powder bed fusi
 # and it will be replaced with their full name and linked to their profile.
 authors:
   - David Bourell
-  - Jeremiah Coholich
+  - admin
   - Antione Chalancon
   - Abhimanyu Bhat
 

@@ -9,7 +9,7 @@ authors:
   - Xiaofeng Guo
   - Bryan Blaise
   - Jennifer Molnar
-  - Jeremiah Coholich
+  - admin
   - Shantanu Padte
   - Ye Zhao
   - Frank L. Hammond III

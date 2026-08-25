@@ -30,6 +30,22 @@ i.custom.custom-huggingface {
   -webkit-mask-image: url("/media/icons/huggingface.svg");
 }
 
+.network-image-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.125em;
+  background-color: currentColor;
+  mask-image: var(--network-icon-url);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--network-icon-url);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
 // Larger thumbnails on the homepage publication sections.
 #publications .media.stream-item img,
 #unpublished .media.stream-item img {

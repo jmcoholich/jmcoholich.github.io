@@ -20,10 +20,10 @@ bio: My research interests include deep learning, reinforcement learning, and le
 
 # Interests to show in About widget
 interests:
-  - Robotics
-  - Computer Vision
-  - Imitation Learning
   - Reinforcement Learning
+  - Robotics
+  - Imitation Learning
+  - Computer Vision
 
 # Education to show in About widget
 education:

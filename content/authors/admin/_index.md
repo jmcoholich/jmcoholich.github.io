@@ -79,9 +79,9 @@ email: ''
 # Highlight the author in author lists? (true/false)
 highlight_name: true
 ---
-<!-- **Update**: I am currently looking for a Fall 2025 internship related to Vision-Language-Action (VLA) models, robot data augmentation, or reinforcement learning.
- Here is my {{< staticref "uploads/Resume_Spring_2025.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
-<!-- {{< icon name="download" pack="fas" >}} -->
+**Update**: I am currently looking for full-time roles as a robot learning researcher with a taget start date in March 2027. I will be at CoRL in Austin from Nov 8th - 13th.
+ <!-- Here is my {{< staticref "uploads/Resume_Spring_2025.pdf" "newtab" >}}resumé{{< /staticref >}}. -->
+<!-- {{< icon name="download" pack="fas" >}}-->
 
 I am a Robotics PhD candidate at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/). My research involves imitation learning and reinforcement learning for robots. During the Fall of 2025, I was an AI resident at [1X Technologies](https://www.1x.tech), working on scaling simulation. I plan to graduate with my PhD in the Summer of 2026. My dissertation will be on robot data augmentation.
 

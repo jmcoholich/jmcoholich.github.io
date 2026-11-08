@@ -31,6 +31,8 @@ featured: true
 links:
   # - name: Code
   #   url: "https://github.com/jaehyeon-son/SeeTraceAct"
+  - name: Project Page
+    url: "https://jaehyeon-son.github.io/seetraceact/"
   - name: arXiv
     url: "https://arxiv.org/abs/2606.02745"
 

@@ -80,7 +80,7 @@ email: ''
 highlight_name: true
 ---
 **Update**: I am currently looking for full-time roles as a robot learning researcher with a taget start date in March 2027. I will be at CoRL in Austin from Nov 8th - 13th.
- Here is my {{< staticref "uploads/Resume_Fall_2026.pdf" "newtab" >}}resumé {{< icon name="download" pack="fas" >}}{{< /staticref >}}.
+ Here is my {{< staticref "uploads/Resume_Fall_2026_updated.pdf" "newtab" >}}resumé {{< icon name="download" pack="fas" >}}{{< /staticref >}}.
 
 I am a Robotics PhD candidate at Georgia Tech in the [Robotics Perception and Learning (RIPL) Lab](https://faculty.cc.gatech.edu/~zk15/). My research involves imitation learning and reinforcement learning for robots. During the Fall of 2025, I was an AI resident at [1X Technologies](https://www.1x.tech), working on scaling simulation. I plan to graduate with my PhD in the Summer of 2026. My dissertation will be on robot data augmentation.
 

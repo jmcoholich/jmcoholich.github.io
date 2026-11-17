@@ -30,7 +30,7 @@ education:
   courses:
     - course: PhD in Robotics
       institution: Georgia Institute of Technology
-      year: Fall 2026 (expected)
+      year: Spring 2027 (expected)
     - course: MS in Computer Science
       institution: Georgia Institute of Technology
       year: 2022
